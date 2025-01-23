@@ -42,7 +42,7 @@ model User {
 model Post {
   id        Int      @id @default(autoincrement())
   userID    Int
-  imageUrl  String
+  imageUrl  File[]
   caption   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,6 +54,14 @@ model Post {
   postTags       PostTag[]
   postHashtag    PostHashtag[]
   collectionPost CollectionPost[]
+}
+
+model File {
+  id        String   @id @default(cuid())
+  fileLink  String
+  createdAt DateTime @default(now())
+
+  posts Post[]
 }
 
 model Comment {

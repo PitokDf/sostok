@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from "express";
 
 const destination = "posts"
 const fileSize = 2500000;
-const uploadPostImage = fileUploader(destination, ["jpeg", "jpg", "png"], fileSize).single("image");
+const uploadPostImage = fileUploader(destination, ["jpeg", "jpg", "png"], fileSize).array("images", 10);
 
 export const uploadPostImageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     // return 
@@ -24,7 +24,7 @@ export const uploadPostImageMiddleware = async (req: Request, res: Response, nex
             });
         }
 
-        if (!req.file) {
+        if (req.files?.length == 0 && !req.file) {
             return res.status(400).json({
                 success: false,
                 statusCode: 400,

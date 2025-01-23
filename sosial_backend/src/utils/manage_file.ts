@@ -37,7 +37,7 @@ export const fileUploader =
     };
 
 export const deleteFile = (filePath: string) => {
-    const fullPath = path.resolve(__dirname, "../..", filePath);
+    const fullPath = path.resolve(__dirname, "../../public", filePath);
 
     exists(fullPath, exists => {
         if (!exists) {
