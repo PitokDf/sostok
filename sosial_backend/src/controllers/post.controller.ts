@@ -3,7 +3,7 @@ import { responseApi } from "../types/response_type";
 import { handleError } from "../utils/handle_error";
 import { deleteFile } from "../utils/manage_file";
 import { getUserLogin } from "../utils/session";
-import { createPostService, deletePostService, getPostByIdService, getPostService, getPostUserService, updatePostService } from "../services/post_service";
+import { createPostService, deletePostService, getPostByIdService, getPostService, getPostUserService, updatePostService } from "../services/post.service";
 
 const destination = "posts"
 
@@ -20,7 +20,6 @@ export const createPostController = async (req: Request, res: Response<responseA
         files.map((file, _index) => {
             imageUrls.push(`${process.env.BASE_URL}/${destination}/${file.filename}`)
         })
-
 
         if (!userID || imageUrls.length == 0 || !caption) {
             files.map((file, _index) => {
@@ -48,17 +47,19 @@ export const getPostUserController = async (req: Request, res: Response<response
         const userLoggin = getUserLogin(req).userID;
 
         const userID = Number(userId) || userLoggin;
-        let posts = await getPostUserService(userID);
-        posts = posts.map((post) => ({
-            ...post,
-            hastag: post.postHashtag.map((relation) => relation.hashtag.name)
-        }));
+        const posts = await getPostUserService(userID);
 
+        let postMap = posts.map((post) => ({
+            totalLikePost: post.likes.length,
+            images: post.imageUrl.map((image) => image.fileLink),
+        }))
+
+        const likeCountReceived = postMap.reduce((prev, current) => prev + current.totalLikePost, 0);
         return res.status(200).json({
             success: true,
             statusCode: 200,
             msg: "Berhasil mendapatkan post",
-            data: posts
+            data: { likeCountReceived }
         })
     } catch (error) {
         return handleError(error, res)
@@ -68,12 +69,25 @@ export const getPostUserController = async (req: Request, res: Response<response
 export const getAllPostController = async (req: Request, res: Response<responseApi>) => {
     try {
         const posts = await getPostService(getUserLogin(req).userID);
-
+        let postMap = posts.map((post) => ({
+            user: {
+                profilePicture: post.user.profilePicture,
+                username: post.user.username
+            },
+            postID: post.id,
+            images: post.imageUrl.map((image) => image.fileLink),
+            likeCount: post.likes.length,
+            commentCount: post.comments.length,
+            saveCount: post.collectionPost.length,
+            caption: post.caption,
+            uploadAt: post.createdAt,
+            hastags: post.postHashtag.map((hastag) => hastag.hashtag.name)
+        }));
         return res.status(200).json({
             success: true,
             statusCode: 200,
             msg: "Berhasil mendapatkan post",
-            data: posts
+            data: postMap
         })
     } catch (error) {
         return handleError(error, res);

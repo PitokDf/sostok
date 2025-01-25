@@ -52,11 +52,11 @@ export const verifyRefreshToken = async (token: string) => {
         return decode as Payload;
     } catch (error: any) {
         if (error instanceof TokenExpiredError) {
-            throw new AppError("Token has expired", 401);
+            throw new AppError("Token has expired", 403);
         } else if (error instanceof JsonWebTokenError) {
             throw new AppError("Invalid token", 401);
         } else {
-            throw new AppError("Authentication failed", 401);
+            throw new AppError("Authentication failed", 403);
         }
     }
 }

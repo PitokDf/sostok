@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { responseApi } from "../types/response_type";
 import { handleError } from "../utils/handle_error";
 import { getUserLogin } from "../utils/session";
-import { followUserService, unfollowUserService } from "../services/follow_service";
+import { followUserService, unfollowUserService } from "../services/follow.service";
 
 export const followUserController = async (req: Request, res: Response<responseApi>) => {
     try {

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/auth_jwt";
-import { createPostController, deletePostController, getAllPostController, getPostByIdController, getPostUserController, updatePostController } from "../controllers/post_controller";
+import { createPostController, deletePostController, getAllPostController, getPostByIdController, getPostUserController, updatePostController } from "../controllers/post.controller";
 import { uploadPostImageMiddleware } from "../middlewares/upload_image_post";
 
 const postRouter = Router();

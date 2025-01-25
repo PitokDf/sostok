@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import ImageSlider from "@/components/ImageSlider";
 import ChatUI from "@/components/ui/ChatUI";
+import PostCard from "@/components/ui/PostCard";
 import SendMessageUI from "@/components/ui/SendMessage";
 import Image from "next/image";
 
@@ -46,11 +47,7 @@ export default function Home() {
         <div className="w-full">
           <SendMessageUI />
         </div>
-        <div className="max-w-[498px]">
-          <ImageSlider images={["http://localhost:2003/posts/pitokk-1737480493791-Screenshot%20from%202024-10-21%2010-44-57.png", "http://localhost:2003/posts/pitokk-1737480493791-Screenshot%20from%202024-10-21%2010-44-57.png"]} />
-        </div>
       </main>
-
       {/* Footer */}
       <footer className="row-start-3 text-center">
         <p className="text-secondary text-sm">

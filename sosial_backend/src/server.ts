@@ -6,6 +6,7 @@ import postRouter from "./routes/posts.routes";
 import path from "path";
 import followRoute from "./routes/follow.routes";
 import compression from "compression"
+import userRouter from "./routes/user.routes";
 
 dotenv.config();
 
@@ -19,9 +20,12 @@ app.use(express.json()); // parse request body jadi json
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/follow", followRoute);
+app.use("/api/v1/users/", userRouter);
 
 const PORT = process.env.PORT || 1212;
 
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
 });
+
+export default app;

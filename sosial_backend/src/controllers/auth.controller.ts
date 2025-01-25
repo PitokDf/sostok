@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
 import { handleError } from "../utils/handle_error"
 import { responseApi } from "../types/response_type";
-import { createUserService, findEmail } from "../services/user_service";
+import { createUserService, findEmail } from "../services/user.service";
 import { compare } from "bcryptjs"
-import { generateRefreshToken, generateToken, hashPassword, verifyRefreshToken } from "../services/auth_service";
+import { generateRefreshToken, generateToken, hashPassword, verifyRefreshToken } from "../services/auth.service";
 import { parseCookie } from "../utils/parse_cookie";
 
 export const loginController = async (req: Request, res: Response<responseApi>) => {

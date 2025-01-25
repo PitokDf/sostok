@@ -1,7 +1,7 @@
 import { Request } from "express";
-import { payload } from "../services/auth_service";
+import { Payload } from "../services/auth.service";
 
 export const getUserLogin = (req: Request) => {
     const userLogged = (req as any).user;
-    return userLogged as payload;
+    return userLogged as Payload;
 }

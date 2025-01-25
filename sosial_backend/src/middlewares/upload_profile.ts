@@ -1,14 +1,13 @@
-import { MulterError } from "multer";
-import { fileUploader } from "../utils/manage_file";
 import { NextFunction, Request, Response } from "express";
+import { fileUploader } from "../utils/manage_file";
+import { MulterError } from "multer";
 
-const destination = "posts"
+const destination = "profiles";
 const fileSize = 2500000;
-const uploadPostImage = fileUploader(destination, ["jpeg", "jpg", "png"], fileSize).array("images", 10);
+const uploadProfile = fileUploader(destination, ["jpeg", "jpg", "png"], fileSize).single("profileImage");
 
-export const uploadPostImageMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    // return 
-    uploadPostImage(req, res, error => {
+export const uploadProfileMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    uploadProfile(req, res, error => {
         if (error) {
             let errorMessage = "failed upload image";
             if (error instanceof MulterError) {
@@ -31,7 +30,6 @@ export const uploadPostImageMiddleware = async (req: Request, res: Response, nex
                 msg: "No file selected!"
             });
         }
-
         next();
     })
 }

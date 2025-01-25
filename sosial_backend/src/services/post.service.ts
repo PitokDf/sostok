@@ -1,6 +1,6 @@
 import { prisma } from "../config/prisma";
 import { AppError } from "../utils/app_error";
-import { getFollowingUserService } from "./follow_service";
+import { getFollowingUserService } from "./follow.service";
 
 const include = {
     comments: true,
@@ -42,7 +42,14 @@ export const getPostService = async (userID: number) => {
     const following = await getFollowingUserService(userID);
     const posts = await prisma.post.findMany({
         where: { user: { id: { in: following.map((follow) => follow.followingID) } } },
-        include: include,
+        include: {
+            comments: true,
+            user: true,
+            likes: true,
+            imageUrl: true,
+            collectionPost: true,
+            postHashtag: { select: { hashtag: { select: { name: true } } } }
+        },
         orderBy: { createdAt: "desc" }
     });
 
@@ -65,7 +72,7 @@ export const getPostUserService = async (userID: number) => {
 
     const post = await prisma.post.findMany({
         where: { userID },
-        include: include
+        include: { postHashtag: true, likes: true, imageUrl: true }
     });
 
     return post;

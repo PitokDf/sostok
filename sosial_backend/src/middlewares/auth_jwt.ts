@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { responseApi } from "../types/response_type";
-import { verifyAccessToken } from "../services/auth_service";
+import { verifyAccessToken } from "../services/auth.service";
 
 export const authenticateToken = async (req: Request, res: Response<responseApi>, next: NextFunction) => {
     const token = req.header("Authorization")?.split(" ")![1];
@@ -11,7 +11,6 @@ export const authenticateToken = async (req: Request, res: Response<responseApi>
         next();
     } catch (error) {
         console.log(error);
-
         return res.status(401).json({ success: false, statusCode: 401, msg: "Invalid or expire token" });
     }
 }

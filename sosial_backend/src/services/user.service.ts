@@ -6,6 +6,11 @@ export const findUsername = async (username: string) => {
     const user = await prisma.user.findFirst({ where: { username } });
     return user;
 }
+export const findUserId = async (userID: number) => {
+    if (!userID) throw new AppError("no provide userID", 400);
+    const user = await prisma.user.findFirst({ where: { id: userID } });
+    return user;
+}
 
 export const findEmail = async (email: string) => {
     if (!email) throw new AppError("no provide email", 400);
@@ -40,7 +45,7 @@ export const deleteUserService = async (userID: number) => {
     return deletedUser;
 }
 
-export const updateUserService = async (userID: number, bio: string, email: string, password: string, username: string, profilePicture: string) => {
+export const updateUserService = async (userID: number, bio: string | undefined, email: string | undefined, password: string | undefined, username: string | undefined, profilePicture: string | undefined) => {
     if (!userID) throw new AppError("no provide User ID", 400);
 
     const existingUser = await prisma.user.findUnique({ where: { id: userID } });
@@ -58,7 +63,10 @@ export const updateUserService = async (userID: number, bio: string, email: stri
 export const userMeService = async (userID: number) => {
     if (!userID) throw new AppError("no provide User ID", 400);
 
-    const existingUser = await prisma.user.findUnique({ where: { id: userID } });
+    const existingUser = await prisma.user.findUnique({
+        where: { id: userID },
+        include: { collections: true, followers: true, followings: true, posts: { include: { imageUrl: true, likes: true, comments: true } }, likes: true }
+    });
     if (!existingUser) throw new AppError("no user found", 404);
 
     return existingUser;

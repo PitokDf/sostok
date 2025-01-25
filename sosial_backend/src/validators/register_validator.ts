@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { check } from "express-validator";
-import { findEmail, findUsername } from "../services/user_service";
+import { findEmail, findUsername } from "../services/user.service";
 import { AppError, expressValidatorResult } from "../utils/app_error";
 
 export const registerValidator = [
