@@ -4,4 +4,4 @@ Disallow: /search
 Disallow: /create
 Disallow: /messages
 
-Sitemap: http://192.168.45.41:3000/api/sitemap
+Sitemap: https://sostok.vercel.app/api/sitemap
