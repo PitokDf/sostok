@@ -7,7 +7,7 @@ export const fileUploader =
     (destination: string, allowedFileType: Array<string>, maxFileSize: number) => {
         // set storage engine
         const storage = diskStorage({
-            destination: `./public/${destination}`,
+            destination: process.env.NODE_ENV === "production" ? `/tmp/${destination}` : `./public/${destination}`,
             filename: (req, file, cb) => {
                 const username = getUserLogin(req).username
                 cb(null, username + "-" + Date.now() + "." + file.mimetype.replace("image/", ""))
