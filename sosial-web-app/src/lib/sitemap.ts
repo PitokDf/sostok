@@ -17,7 +17,7 @@ export const generateSitemap = (
     
         ${users.map(user => `
         <url>
-            <loc>${baseUrl}/${user.username}</loc>
+            <loc>${baseUrl}/profile/${user.username}</loc>
             <lastmod>${user?.updatedAt!}</lastmod>
             <priority>0.8</priority>
         </url>
