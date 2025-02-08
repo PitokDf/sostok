@@ -1,7 +1,6 @@
 import AppBar from "@/components/AppBar";
 import MobileNavigation from "@/components/MobileNav";
 import Navigation from "@/components/Navigation";
-import { AuthProvider } from "@/context/AuthContext";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (

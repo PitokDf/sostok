@@ -9,11 +9,15 @@ interface ProfilePageProps {
 export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
     const { username } = await params
     return {
-        title: `@${username} - Sostok Profile`,
-        description: `Profile page of ${username} on Sostok`,
+        title: `@${username} - SOSTOK Profile`,
+        description: `Profile page of ${username} on SOSTOK`,
         openGraph: {
             title: `@${username}'s Profile`,
-            description: `View ${username}'s posts and activities on Sostok`,
+            description: `View ${username}'s posts and activities on SOSTOK`,
+            siteName: "SOSTOK",
+            images: ["https://sostok.vercel.app/images/favicon.ico"],
+            locale: 'id_ID',
+            type: "website"
         }
     }
 }
