@@ -2,7 +2,6 @@ import { genSalt, hash } from "bcryptjs"
 import jwt_config from "../config/jwt_config";
 import { JsonWebTokenError, sign, TokenExpiredError, verify } from "jsonwebtoken";
 import { AppError } from "../utils/app_error";
-import { getUserLogin } from "../utils/session";
 import { prisma } from "../config/prisma";
 
 export type Payload = {
@@ -22,23 +21,22 @@ export const hashPassword = async (password: any) => {
 }
 
 export const generateToken = async (payload: Payload) => {
-    return sign(payload, { key: jwt_config.privateKey, passphrase: jwt_config.passphrase },
-        { expiresIn: jwt_config.accessTokenExpireIn, issuer: jwt_config.issuer, audience: jwt_config.audience, algorithm: "RS256" }
+    return sign(payload, jwt_config.apiToken!,
+        { expiresIn: jwt_config.accessTokenExpireIn, issuer: jwt_config.issuer, audience: jwt_config.audience }
     );
 }
 
 export const generateRefreshToken = async (payload: Payload) => {
-    return sign(payload, { key: jwt_config.privateKey, passphrase: jwt_config.passphrase },
-        { expiresIn: jwt_config.refreshTokenExpireIn, issuer: jwt_config.issuer, audience: jwt_config.audience, algorithm: "RS256" }
+    return sign(payload, jwt_config.apiToken!,
+        { expiresIn: jwt_config.refreshTokenExpireIn, issuer: jwt_config.issuer, audience: jwt_config.audience }
     );
 }
 
 export const verifyAccessToken = async (token: string) => {
     return new Promise((resolve, reject) => {
-        verify(token, jwt_config.publicKey, {
+        verify(token, jwt_config.apiToken!, {
             issuer: jwt_config.issuer,
             audience: jwt_config.audience,
-            algorithms: ["RS256"]
         }, (err, decode) => {
             if (err) return reject("Invalid or expire token");
             resolve(decode)
@@ -48,7 +46,7 @@ export const verifyAccessToken = async (token: string) => {
 
 export const verifyRefreshToken = async (token: string) => {
     try {
-        const decode = verify(token, jwt_config.publicKey,
+        const decode = verify(token, jwt_config.apiToken!,
             { issuer: jwt_config.issuer, audience: jwt_config.audience }
         );
         return decode as Payload;
