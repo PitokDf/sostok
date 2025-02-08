@@ -6,10 +6,25 @@ export const findUsername = async (username: string) => {
     const user = await prisma.user.findFirst({ where: { username } });
     return user;
 }
+
 export const findUserId = async (userID: number) => {
     if (!userID) throw new AppError("no provide userID", 400);
     const user = await prisma.user.findFirst({ where: { id: userID } });
+    if (!user) throw new AppError("User not found", 404);
     return user;
+}
+
+export const getAllUserService = async () => {
+    const users = await prisma.user.findMany({
+        select: {
+            username: true,
+            profilePicture: true,
+            isVerified: true,
+            updatedAt: true
+        }
+    })
+
+    return users
 }
 
 export const findEmail = async (email: string) => {
@@ -60,12 +75,22 @@ export const updateUserService = async (userID: number, bio: string | undefined,
     return updatedUser;
 }
 
-export const userMeService = async (userID: number) => {
-    if (!userID) throw new AppError("no provide User ID", 400);
+export const userMeService = async (username: string) => {
+    if (!username) throw new AppError("no provide User ID", 400);
 
     const existingUser = await prisma.user.findUnique({
-        where: { id: userID },
-        include: { collections: true, followers: true, followings: true, posts: { include: { imageUrl: true, likes: true, comments: true } }, likes: true }
+        where: { username },
+        include: {
+            collections: true, followers: true, followings: true,
+            posts: {
+                include: { imageUrl: true, likes: true, comments: true },
+                orderBy: { createdAt: "desc" }
+            }, likes: true,
+            savedPosts: {
+                include: { post: { select: { imageUrl: true } } },
+                orderBy: { createdAt: "desc" }
+            }
+        }
     });
     if (!existingUser) throw new AppError("no user found", 404);
 

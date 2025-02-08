@@ -4,10 +4,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import Image from 'next/image';
 
 export default function SwipeSlider({ images }: { images: string[] }) {
     return (
-        <div className="relative w-full max-w-[500px] mx-auto">
+        <div className="relative w-full max-w-[600px] mx-auto">
             <Swiper
                 modules={[Pagination]}
                 spaceBetween={0}
@@ -26,9 +27,10 @@ export default function SwipeSlider({ images }: { images: string[] }) {
                 {images.map((image, index) => (
                     <SwiperSlide key={index} className="flex justify-center items-center">
                         <img
+                            loading='lazy'
                             src={image}
                             alt={`Slide ${index}`}
-                            className=" h-[355px] md:h-[490px] object-contain"
+                            className=" h-[355px] object-cover"
                         />
                     </SwiperSlide>
                 ))}

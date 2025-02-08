@@ -7,9 +7,9 @@ import { followUserService, unfollowUserService } from "../services/follow.servi
 export const followUserController = async (req: Request, res: Response<responseApi>) => {
     try {
         const userLogged = getUserLogin(req).userID;
-        const { followingID } = req.body;
+        const { userID } = req.params;
 
-        const newFollow = await followUserService(userLogged, followingID);
+        const newFollow = await followUserService(userLogged, Number(userID));
 
         return res.status(200).json({
             success: true,
@@ -24,9 +24,9 @@ export const followUserController = async (req: Request, res: Response<responseA
 export const unfollowUserController = async (req: Request, res: Response<responseApi>) => {
     try {
         const userLogged = getUserLogin(req).userID;
-        const { followingID } = req.body;
+        const { userID } = req.params;
 
-        const unFollow = await unfollowUserService(userLogged, Number(followingID));
+        const unFollow = await unfollowUserService(userLogged, Number(userID));
 
         return res.status(200).json({
             success: true,

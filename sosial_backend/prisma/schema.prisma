@@ -107,7 +107,7 @@ model Story {
   userID    Int
   imageUrl  String
   type      String
-  isActive  Boolean  @default(true)
+  expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -136,7 +136,7 @@ model SavedPost {
 }
 
 model Conversation {
-  id           Int                  @id @default(autoincrement())
+  id           String               @id @default(uuid())
   particapants UserOnConversation[]
   messages     Message[]
   createdAt    DateTime             @default(now())
@@ -146,7 +146,7 @@ model Conversation {
 
 model UserOnConversation {
   userId         Int
-  conversationId Int
+  conversationId String
   role           String
 
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -157,7 +157,7 @@ model UserOnConversation {
 
 model Message {
   id             Int      @id @default(autoincrement())
-  conversationID Int
+  conversationID String
   senderID       Int
   receiverID     Int
   text           String

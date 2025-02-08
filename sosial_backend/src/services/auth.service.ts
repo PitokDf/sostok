@@ -2,6 +2,8 @@ import { genSalt, hash } from "bcryptjs"
 import jwt_config from "../config/jwt_config";
 import { JsonWebTokenError, sign, TokenExpiredError, verify } from "jsonwebtoken";
 import { AppError } from "../utils/app_error";
+import { getUserLogin } from "../utils/session";
+import { prisma } from "../config/prisma";
 
 export type Payload = {
     userID: number,
@@ -52,11 +54,18 @@ export const verifyRefreshToken = async (token: string) => {
         return decode as Payload;
     } catch (error: any) {
         if (error instanceof TokenExpiredError) {
-            throw new AppError("Token has expired", 403);
+            throw new AppError("Token has expired", 401);
         } else if (error instanceof JsonWebTokenError) {
             throw new AppError("Invalid token", 401);
         } else {
-            throw new AppError("Authentication failed", 403);
+            throw new AppError("Authentication failed", 401);
         }
     }
+}
+
+export async function getMeInfoService(userID: number) {
+    if (!userID) throw new AppError("no provide userID", 400);
+    const user = await prisma.user.findFirst({ where: { id: userID } });
+    if (!user) throw new AppError("user not found", 404);
+    return user;
 }

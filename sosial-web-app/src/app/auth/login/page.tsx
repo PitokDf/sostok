@@ -1,66 +1,33 @@
-import Button from "@/components/Button";
-import Input from "@/components/Input";
-import Label from "@/components/Label";
-import { KeySquare, Mail } from "lucide-react";
+import LoginForm from "@/components/ui/auth/LoginForm";
+import { Metadata } from "next";
+import Image from "next/image";
+
+export const metadata: Metadata = {
+    title: 'Login SosTok',
+    description: "Login ke sostok untuk masuk ke akun"
+};
 
 export default function LoginPage() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-light">
             {/* Login Card */}
-            <div className="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-primary text-center mb-6">Login</h2>
-                <form className="space-y-4">
-                    {/* Email Input */}
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-secondary mb-1"
-                        >
-                            Email Address
-                        </label>
-                        <Input
-                            preffixIcon={
-                                <Mail />
-                            }
-                            placeholder="Enter your email"
-                            id="email"
-                            type="email"
-                        />
-                    </div>
-
-                    {/* Password Input */}
-                    <div>
-                        <Label htmlFor="password">Password </Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Enter your password"
-                            preffixIcon={<KeySquare />}
-                        />
-                    </div>
-
-                    {/* Login Button */}
-                    <div>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="medium"
-                            shape="square"
-                            className={`w-full`}
-                        >
-                            Login
-                        </Button>
-                    </div>
-                </form>
-
-                {/* Footer */}
-                <p className="text-sm text-secondary text-center mt-4">
-                    Don’t have an account?{" "}
-                    <a href="/register" className="text-primary hover:underline">
-                        Register here
-                    </a>
-                </p>
+            <div className="w-full md:max-w-xl flex gap-4 max-w-sm bg-card p-8 rounded-lg shadow-md">
+                <div className="hidden md:flex object-cover max-w-full overflow-hidden flex-1">
+                    <img src="/images/sostok-logo.png" className="object-cover" alt="sostok logo" />
+                </div>
+                <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-primary text-center mb-6">Login</h2>
+                    <LoginForm />
+                    {/* Footer */}
+                    <p className="text-sm text-center mt-4">
+                        Don’t have an account?{" "}
+                        <a href="/auth/register" className="text-primary hover:underline">
+                            Register here
+                        </a>
+                    </p>
+                </div>
             </div>
+
         </div>
     );
 }

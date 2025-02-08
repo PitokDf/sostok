@@ -1,110 +1,128 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Pusher from 'pusher-js';
 
-type Message = {
-    id: number;
-    text: string;
-    sender: 'user' | 'bot';
-};
+interface Message {
+    id: string;
+    content: string;
+    senderId: string;
+    createdAt: Date;
+}
 
-export default function ChatUI() {
+const ChatPage = () => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [inputValue, setInputValue] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-    const handleSendMessage = () => {
-        if (inputValue.trim() !== '') {
-            const newMessage: Message = {
-                id: messages.length + 1,
-                text: inputValue,
-                sender: 'user',
-            };
-            setMessages([...messages, newMessage]);
-            setInputValue('');
-            setIsTyping(false);
-
-            setTimeout(() => {
-                const botMessage: Message = {
-                    id: messages.length + 2,
-                    text: `Bot reply to "${inputValue}"`,
-                    sender: 'bot',
-                };
-                setMessages((prevMessages) => [...prevMessages, botMessage]);
-            }, 1000);
-        }
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setInputValue(e.target.value);
-        setIsTyping(true);
-
-        setTimeout(() => {
-            setIsTyping(false);
-        }, 1500); // Reset typing state after 1.5 seconds
-    };
+    const [newMessage, setNewMessage] = useState('');
+    const [participant, setParticipant] = useState<any>(null);
+    const { conversationId } = useParams();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages, isTyping]);
+        const fetchData = async () => {
+            const user = {};
+            //   const conversation = await prisma.conversation.findUnique({
+            //     where: { id: conversationId },
+            //     include: {
+            //       participants: true,
+            //       messages: true
+            //     }
+            //   });
+
+            //   if (!conversation || !user) {
+            //     router.push('/');
+            //     return;
+            //   }
+
+            //   const otherParticipant = conversation.participants.find(
+            //     p => p.id !== user.id
+            //   );
+
+            // setParticipant(otherParticipant);
+            //   setMessages(conversation.messages);
+        };
+
+        fetchData();
+
+        // Setup Pusher
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+            cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+            channelAuthorization: {
+                endpoint: '/api/pusher/auth',
+                transport: 'ajax'
+            }
+        });
+
+        const channel = pusher.subscribe(`conversation-${conversationId}`);
+
+        channel.bind('new-message', (message: Message) => {
+            setMessages(prev => [...prev, message]);
+        });
+
+        return () => {
+            pusher.unsubscribe(`conversation-${conversationId}`);
+            pusher.disconnect();
+        };
+    }, [conversationId]);
+
+    const handleSendMessage = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newMessage.trim()) return;
+
+        // await axios.post(`/api/conversations/${conversationId}/messages`, {
+        //     content: newMessage
+        // });
+
+        setNewMessage('');
+    };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-900 text-white">
-            <div className="flex-1 p-4 overflow-y-auto">
-                <div className="space-y-4">
-                    {messages.map((message) => (
-                        <MessageBubble key={message.id} message={message} />
-                    ))}
-                    {isTyping && <TypingIndicator />}
-                    <div ref={messagesEndRef} />
-                </div>
-            </div>
-            <div className="flex p-4 bg-gray-800">
-                <textarea
-                    className="flex-1 p-2 rounded-l-lg bg-gray-700 text-white border border-gray-600 focus:outline-none resize-none"
-                    placeholder="Type a message..."
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                    rows={1}
-                    onInput={(e) => {
-                        const target = e.target as HTMLTextAreaElement;
-                        target.style.height = 'auto';
-                        target.style.height = `${target.scrollHeight}px`;
-                    }}
+        <div className="flex flex-col h-screen max-w-2xl mx-auto">
+            <div className="p-4 border-b flex items-center gap-2">
+                <img
+                    src={participant?.profilePicture || '/default-avatar.png'}
+                    className="w-10 h-10 rounded-full"
                 />
-                <button
-                    onClick={handleSendMessage}
-                    className="bg-blue-600 px-4 rounded-r-lg text-white hover:bg-blue-500"
-                >
-                    Send
-                </button>
+                <h2 className="font-semibold">{participant?.username}</h2>
             </div>
-        </div>
-    );
-}
 
-function MessageBubble({ message }: { message: Message }) {
-    const isUser = message.sender === 'user';
-    return (
-        <div
-            className={`max-w-xs p-3 rounded-xl shadow-lg text-sm ${isUser
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white self-end animate-slideInRight'
-                : 'bg-gradient-to-r from-gray-700 to-gray-800 text-white self-start animate-slideInLeft'
-                } ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'}`}
-        >
-            {message.text}
-        </div>
-    );
-}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map(message => (
+                    <div
+                        key={message.id}
+                        className={`flex ${message.senderId === participant?.id ? 'justify-start' : 'justify-end'}`}
+                    >
+                        <div className={`max-w-xs p-3 rounded-lg ${message.senderId === participant?.id
+                            ? 'bg-gray-100'
+                            : 'bg-blue-500 text-white'
+                            }`}>
+                            {message.content}
+                        </div>
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
 
-function TypingIndicator() {
-    return (
-        <div className="self-start p-3 bg-gray-700 text-white rounded-xl text-sm animate-pulse">
-            Bot is typing...
+            <form onSubmit={handleSendMessage} className="p-4 border-t">
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder="Type a message..."
+                        className="flex-1 border rounded-lg px-4 py-2 focus:outline-none"
+                    />
+                    <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    >
+                        Send
+                    </button>
+                </div>
+            </form>
         </div>
     );
-}
+};
+
+export default ChatPage;

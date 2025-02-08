@@ -38,19 +38,22 @@ export const createPostService = async (imageUrl: Array<string>, userID: number,
     return newPost;
 }
 
-export const getPostService = async (userID: number) => {
+export const getPostService = async (userID: number, pageNumber = 1, limitNumber = 5) => {
     const following = await getFollowingUserService(userID);
     const posts = await prisma.post.findMany({
         where: { user: { id: { in: following.map((follow) => follow.followingID) } } },
         include: {
             comments: true,
             user: true,
-            likes: true,
+            likes: { include: { user: true } },
             imageUrl: true,
+            savedPosts: { include: { user: true } },
             collectionPost: true,
             postHashtag: { select: { hashtag: { select: { name: true } } } }
         },
-        orderBy: { createdAt: "desc" }
+        skip: (pageNumber - 1) * limitNumber,
+        take: limitNumber + 1,
+        orderBy: { updatedAt: "desc" }
     });
 
     return posts;

@@ -68,11 +68,14 @@ export const getPostUserController = async (req: Request, res: Response<response
 
 export const getAllPostController = async (req: Request, res: Response<responseApi>) => {
     try {
-        const posts = await getPostService(getUserLogin(req).userID);
+        const user = await getUserLogin(req);
+        const { pageNumber = 1, limitNumber = 10 } = req.query
+        const posts = await getPostService(user.userID, Number(pageNumber), Number(limitNumber));
         let postMap = posts.map((post) => ({
             user: {
                 profilePicture: post.user.profilePicture,
-                username: post.user.username
+                username: post.user.username,
+                isVerified: post.user.isVerified
             },
             postID: post.id,
             images: post.imageUrl.map((image) => image.fileLink),
@@ -80,14 +83,24 @@ export const getAllPostController = async (req: Request, res: Response<responseA
             commentCount: post.comments.length,
             saveCount: post.collectionPost.length,
             caption: post.caption,
+            likedBy: post.likes.map((like) => like.user.username),
+            saveBy: post.savedPosts.map(save => save.user.username),
             uploadAt: post.createdAt,
             hastags: post.postHashtag.map((hastag) => hastag.hashtag.name)
         }));
+
+        const hasNext = postMap.length > Number(limitNumber)
         return res.status(200).json({
             success: true,
             statusCode: 200,
             msg: "Berhasil mendapatkan post",
-            data: postMap
+            data: {
+                pagination: {
+                    hasNext,
+                    nextPage: hasNext ? Number(pageNumber) + 1 : null
+                },
+                posts: postMap,
+            }
         })
     } catch (error) {
         return handleError(error, res);

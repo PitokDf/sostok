@@ -10,7 +10,7 @@ export const fileUploader =
             destination: `./public/${destination}`,
             filename: (req, file, cb) => {
                 const username = getUserLogin(req).username
-                cb(null, username + "-" + Date.now() + "-" + file.originalname)
+                cb(null, username + "-" + Date.now() + "." + file.mimetype.replace("image/", ""))
             },
         });
 

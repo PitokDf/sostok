@@ -3,8 +3,9 @@ import { handleError } from "../utils/handle_error"
 import { responseApi } from "../types/response_type";
 import { createUserService, findEmail } from "../services/user.service";
 import { compare } from "bcryptjs"
-import { generateRefreshToken, generateToken, hashPassword, verifyRefreshToken } from "../services/auth.service";
+import { generateRefreshToken, generateToken, getMeInfoService, hashPassword, verifyRefreshToken } from "../services/auth.service";
 import { parseCookie } from "../utils/parse_cookie";
+import { getUserLogin } from "../utils/session";
 
 export const loginController = async (req: Request, res: Response<responseApi>) => {
     try {
@@ -50,11 +51,7 @@ export const loginController = async (req: Request, res: Response<responseApi>) 
             success: true,
             statusCode: 200,
             msg: "Berhasil login",
-            data: {
-                user: payload,
-                accessToken,
-                refreshToken
-            }
+            data: payload
         });
     } catch (error) {
         handleError(error, res);
@@ -81,11 +78,8 @@ export const registerController = async (req: Request, res: Response<responseApi
         res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
         res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" })
         return res.status(201).json({
-            success: true, statusCode: 201, msg: "Registered successfully", data: {
-                user: payload,
-                accessToken,
-                refreshToken
-            }
+            success: true, statusCode: 201, msg: "Registered successfully",
+            data: payload
         });
     } catch (error) {
         handleError(error, res);
@@ -130,12 +124,24 @@ export const refreshTokenController = async (req: Request, res: Response<respons
         return res.status(200).json({
             success: true,
             statusCode: 200,
-            msg: "Berhasil merefresh akses token",
-            data: {
-                accessToken: newAccessToken
-            }
+            msg: "Berhasil merefresh akses token"
         })
     } catch (error) {
         return handleError(error, res)
+    }
+}
+
+export async function getMeInfoController(req: Request, res: Response<responseApi>) {
+    try {
+        const userLogged = await getUserLogin(req);
+        const getInfo = await getMeInfoService(userLogged.userID);
+        return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            msg: "Berhasil mendapatkan informasi",
+            data: getInfo
+        })
+    } catch (error) {
+        return handleError(error, res);
     }
 }

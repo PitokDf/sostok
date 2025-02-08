@@ -2,7 +2,7 @@ export default function Label({ children, htmlFor }: { children: React.ReactNode
     return (
         <label
             htmlFor={htmlFor}
-            className="block text-sm font-medium text-secondary mb-1"
+            className="block text-sm font-medium mb-1"
         >
             {children}
         </label>

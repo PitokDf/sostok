@@ -10,7 +10,7 @@ interface inputProps {
     placeholder?: string,
     id: string,
     variant?: "error" | "normal",
-    onChange?: ChangeEventHandler | undefined,
+    onChange?: ChangeEventHandler<HTMLInputElement> | undefined,
     name?: string,
     value?: any,
     accept?: string,

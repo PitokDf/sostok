@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 import { responseApi } from "../types/response_type";
 import { handleError } from "../utils/handle_error";
-import { findUserId, updateUserService, userMeService } from "../services/user.service";
-import { getUserLogin } from "../utils/session";
-import { hashPassword } from "../services/auth.service";
+import { findUserId, getAllUserService, updateUserService, userMeService } from "../services/user.service";
+import { hashPassword, Payload, verifyRefreshToken } from "../services/auth.service";
 import { deleteFile } from "../utils/manage_file";
 
 export const profileController = async (req: Request, res: Response<responseApi>) => {
     try {
-        const userLoggin = getUserLogin(req);
-        const { userID } = req.params;
-        const user = await userMeService(Number(userID) || userLoggin.userID);
+        const refreshToken = req.cookies.refreshToken;;
+        let userLoggin;
+        if (refreshToken) userLoggin = await verifyRefreshToken(refreshToken)
+
+        const { username } = req.params;
+        const user = await userMeService(username || userLoggin?.username!);
 
         const profile = {
             id: user.id,
@@ -19,14 +21,21 @@ export const profileController = async (req: Request, res: Response<responseApi>
             bio: user.bio,
             profilePicture: user.profilePicture,
             isVerified: user.isVerified,
-            followers: user.followers.length,
-            followings: user.followings.length,
+            postsCount: user.posts.length,
+            followings: user.followers.length,
+            followers: user.followings.length,
             likeReceiveCount: user.likes.length,
+            isOwnProfile: !refreshToken ? false : userLoggin?.userID === user.id,
+            isFollowing: !refreshToken ? false : user.followings.some((v) => v.followerID === (userLoggin! as Payload).userID),
             posts: user.posts.map((post) => ({
                 id: post.id,
                 images: post.imageUrl.map((image) => image.fileLink),
                 likeCount: post.likes.length,
                 commentCount: post.comments.length
+            })),
+            savedPost: user.savedPosts.map(savedPost => ({
+                id: savedPost.id,
+                imageUrl: savedPost.post.imageUrl.map(url => url.fileLink)[0]
             }))
         }
         return res.status(200).json({
@@ -35,6 +44,28 @@ export const profileController = async (req: Request, res: Response<responseApi>
             msg: "Berhasil mendapatkan data.",
             data: profile
         })
+    } catch (error) {
+        return handleError(error, res)
+    }
+}
+
+export const getAllUserController = async (req: Request, res: Response<responseApi>) => {
+    try {
+        const users = await getAllUserService()
+        return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            msg: "Get all users",
+            data: users
+        })
+    } catch (error) {
+        return handleError(error, res)
+    }
+}
+
+export const deleteProfilePictureController = async (req: Request, res: Response<responseApi>) => {
+    try {
+
     } catch (error) {
         return handleError(error, res)
     }

@@ -8,78 +8,79 @@ export default {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
         primary: {
-          DEFAULT: '#1DA1F2',
-          hover: '#1A8CD8',
-          active: '#166BBF',
-          disabled: '#A3D4F7',
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: '#657786',
-          hover: '#4C5E6F',
-          active: '#3A4958',
-          disabled: '#B0BEC5',
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
-        warning: {
-          DEFAULT: '#FF9900',
-          hover: '#E68000',
-          active: '#CC6D00',
-          disabled: '#FFD1A3',
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
-        error: {
-          DEFAULT: '#FF4D4D',
-          hover: '#E63939',
-          active: '#CC2F2F',
-          disabled: '#FFB3B3',
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
-        success: {
-          DEFAULT: '#28A745',
-          hover: '#218838',
-          active: '#1C7430',
-          disabled: '#A9DFB1',
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
-        info: {
-          DEFAULT: '#17A2B8',
-          hover: '#138A9C',
-          active: '#0F7081',
-          disabled: '#8BD5DF',
-        },
-        black: {
-          DEFAULT: '#222222',
-        },
-        white: {
-          DEFAULT: '#FFFFFF',
-        },
-        light: {
-          DEFAULT: '#F5F5F5',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        chart: {
+          '1': 'hsl(var(--chart-1))',
+          '2': 'hsl(var(--chart-2))',
+          '3': 'hsl(var(--chart-3))',
+          '4': 'hsl(var(--chart-4))',
+          '5': 'hsl(var(--chart-5))',
         },
       },
-      transitionProperty: {
-        button: 'background-color, box-shadow',
-      },
-      boxShadow: {
-        button: '0 2px 4px rgba(0, 0, 0, 0.2)',
-        'inset-button': 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
-      },
-      scale: {
-        pressed: '0.98',
+      eyframes: {
+        'accordion-down': {
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+        },
+        'accordion-up': {
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
+        },
       },
       animation: {
-        slideInLeft: 'slideInLeft 0.3s ease-out',
-        slideInRight: 'slideInRight 0.3s ease-out',
-      },
-      keyframes: {
-        slideInLeft: {
-          '0%': { opacity: '0', transform: 'translateX(-20px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(20px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
