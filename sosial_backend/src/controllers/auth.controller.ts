@@ -45,8 +45,8 @@ export const loginController = async (req: Request, res: Response<responseApi>) 
 
         const accessToken = await generateToken(payload);
         const refreshToken = await generateRefreshToken(payload);
-        res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
-        res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" })
+        res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: "none", secure: process.env.NODE_ENV === "production" });
+        res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: "none", secure: process.env.NODE_ENV === "production" })
         return res.status(200).json({
             success: true,
             statusCode: 200,
@@ -75,8 +75,8 @@ export const registerController = async (req: Request, res: Response<responseApi
 
         const accessToken = await generateToken(payload);
         const refreshToken = await generateRefreshToken(payload);
-        res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
-        res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" })
+        res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: "none", secure: process.env.NODE_ENV === "production" });
+        res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: "none", secure: process.env.NODE_ENV === "production" })
         return res.status(201).json({
             success: true, statusCode: 201, msg: "Registered successfully",
             data: payload
@@ -118,7 +118,7 @@ export const refreshTokenController = async (req: Request, res: Response<respons
         });
 
         res.cookie("accessToken", newAccessToken,
-            { maxAge: 3600000, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" }
+            { maxAge: 3600000, httpOnly: true, sameSite: "none", secure: process.env.NODE_ENV === "production" }
         );
 
         return res.status(200).json({
