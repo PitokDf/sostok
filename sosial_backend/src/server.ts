@@ -24,9 +24,9 @@ app.use(cors({
 app.use(cookieParser()); // untuk parsing cookies pada request
 app.use(compression()); // kompresi response json agar lebih kecil
 app.use(morgan("dev")); // nampilin log request yang masuk pada console
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.json()); // parse request body jadi json
 
+process.env.NODE_ENV === "production" && app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.json()); // parse request body jadi json
 
 app.use("/api/v1/pusher", pusherRoute)
 app.use("/api/v1/auth", authRouter); // routing untuk endpoint authentication
