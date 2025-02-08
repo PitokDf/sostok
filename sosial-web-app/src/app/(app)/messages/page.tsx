@@ -29,8 +29,7 @@ export default function MessagesPage() {
     const [messages, setMessages] = useState<Message[]>([])
     const [isSending, setIsSending] = useState(false)
 
-    const sendAudioRef = useRef<HTMLAudioElement>(new Audio('/sounds/message-send.mp3'))
-    const notificationdAudioRef = useRef<HTMLAudioElement>(new Audio('/sounds/message-notification.mp3'))
+    // const notificationdAudioRef = useRef<HTMLAudioElement>(new Audio('/sounds/message-notification.mp3'))
 
     const fetchConversation = async () => {
         const res = await getConversationList();
@@ -60,7 +59,7 @@ export default function MessagesPage() {
 
     usePusherChannel(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'new-message', (data: Message) => {
         fetchConversation()
-        data.isMine !== user.userID && notificationdAudioRef.current.play().then(err => console.log(err))
+        // useRef<HTMLAudioElement>(new Audio('/sounds/message-notification.mp3')).current.play().then().catch(error => console.log(error))
         setMessages(prev => [
             ...prev, data
         ])
@@ -91,7 +90,7 @@ export default function MessagesPage() {
         try {
             setIsSending(true)
             await sendMessage(selectedChat.conversationID, { content: encrypt(messageInput), receiverID: selectedChat.receiverID })
-            sendAudioRef.current.play().then(err => console.log(err))
+            // useRef<HTMLAudioElement>(new Audio('/sounds/message-send.mp3')).current.play().then().catch(error => console.log(error))
             removeFromLocaleStorage('selectedChat')
             setMessageInput("")
         } catch (error) {

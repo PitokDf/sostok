@@ -1,7 +1,4 @@
 import { Post, Story } from "./types";
-import { ApiService } from "./api-services";
-
-const service = new ApiService()
 
 const stories: Story[] = [{
     id: 1,
@@ -18,17 +15,6 @@ export async function getStories(): Promise<Story[]> {
         .filter(story => new Date(story.expiresAt).getTime() < now)
         .sort((a, b) =>
             new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
-}
-
-export async function getPostBeranda(): Promise<Post[]> {
-    try {
-        const res = await service.get("/posts/users/beranda");
-        const posts: Post[] = res.data.data;
-        return posts
-    } catch (error) {
-        console.log(error);
-        throw error
-    }
 }
 
 export async function createStory(story: Story): Promise<Story> {
