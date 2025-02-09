@@ -26,7 +26,7 @@ export function ShareProfileModal({ username }: ShareProfileModalProps) {
     }
 
     const handleShare = (platform: string) => {
-        const text = `Check out ${username}'s profile on SOSTOK!`
+        const text = `Check out ${username}'s profile on chatSostok!`
         let url = ""
 
         switch (platform) {
@@ -107,7 +107,7 @@ export function ShareProfileModal({ username }: ShareProfileModalProps) {
                                     if (navigator.share) {
                                         navigator.share({
                                             title: `${username}'s Profile`,
-                                            text: `Check out ${username}'s profile on SOSTOK!`,
+                                            text: `Check out ${username}'s profile on chatSostok!`,
                                             url: profileUrl
                                         })
                                     }

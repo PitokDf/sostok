@@ -10,18 +10,18 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: 'SOSTOK',
-  description: 'Connect and share with friends on SOSTOK',
+  title: 'chatSostok',
+  description: 'Connect and share with friends on chatSostok',
   icons: "/images/favicon.ico",
   verification: {
     google: "7UVWLjtHfAA1ccchiarJNOFElAmh6e2a4nHTqbosAZU"
   },
-  keywords: ["sostok", "sosial media", "chatingan", "selingkuh", "pemula"],
+  keywords: ["chatSostok", "sosial media", "chatingan", "selingkuh", "pemula"],
   openGraph: {
-    title: "SOSTOK",
-    description: 'Connect and share with friends on SOSTOK',
+    title: "chatSostok",
+    description: 'Connect and share with friends on chatSostok',
     url: "https://sostok.vercel.app/",
-    siteName: "SOSTOK",
+    siteName: "chatSostok",
     images: ["https://sostok.vercel.app/images/favicon.ico"],
     locale: 'id_ID',
     type: "website"

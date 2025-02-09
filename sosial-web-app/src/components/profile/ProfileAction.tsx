@@ -1,4 +1,4 @@
-import { MessageCircle, Settings, SquareArrowOutUpLeft, UserCheck, UserPlus } from "lucide-react";
+import { Settings } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Profile } from "@/lib/types";
 import { ShareProfileModal } from "../ShareProfileModal";
@@ -23,13 +23,6 @@ export default function ProfileAction({ profile }: { profile: Profile }) {
                 <>
                     <FollowAction following={profile.isFollowing} userID={profile.id} />
                     <InitiateMessageButton targetID={profile.id} />
-                    {/* <Button
-                        className="w-full flex-1"
-                        size={"sm"}
-                    >
-                        <MessageCircle className="mr-2 w-4 h-4" />
-                        Message
-                    </Button> */}
                 </>
             )}
         </div>
