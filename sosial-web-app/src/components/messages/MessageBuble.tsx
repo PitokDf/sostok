@@ -7,8 +7,9 @@ import { Button } from "../ui/Button";
 import { useState } from "react";
 import { decrypt } from "@/utils/enkripsi";
 import DeleteMessageButton from "./DeleteMessage";
+import EditMessage from "./EditMessage";
 
-export default function MessageBuble({ message, conversationID }: { message: Message, conversationID: string }) {
+export default function MessageBuble({ message }: { message: Message }) {
     const user = getFromLocalStorage('user')
     const [copied, setCopied] = useState(false)
     const handleCopy = async (text: any) => {
@@ -32,23 +33,23 @@ export default function MessageBuble({ message, conversationID }: { message: Mes
                     : "bg-muted rounded-r-xl rounded-bl-xl"
                     }`}
             >
-                <p className="break-words relative">
+                <span className="break-words relative">
                     {decrypt(message.content)}
-
-                    <DropdownMenu >
-                        <DropdownMenuTrigger asChild className={`cursor-pointer group-hover:opacity-90 bg-transparent hover:bg-transparent opacity-0 absolute transition-all bottom-[-1rem] ${isMine ? "left-[-3rem]" : "right-[-3rem]"}`}>
-                            <Button variant={"ghost"} size={'icon'} className="h-8 w-8">
-                                <ChevronDown className={``} />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {isMine && <DeleteMessageButton conversationID={conversationID} messageID={message.id} />}
-                            <DropdownMenuItem onClick={() => { handleCopy(decrypt(message.content)) }}>
-                                {copied ? 'Copied' : 'Copy'}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </p>
+                    <div className={`cursor-pointer gap-2 flex flex-col group-hover:opacity-90 bg-transparent hover:bg-transparent opacity-0 absolute transition-all bottom-[-2rem] ${isMine ? "left-[-3rem]" : "right-[-3rem]"}`}>
+                        {isMine && <EditMessage message={message} />}
+                        <DropdownMenu >
+                            <DropdownMenuTrigger asChild >
+                                <ChevronDown className={`h-6 w-6`} />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {isMine && <DeleteMessageButton messageID={message.id} />}
+                                <DropdownMenuItem onClick={() => { handleCopy(decrypt(message.content)) }}>
+                                    {copied ? 'Copied' : 'Copy'}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </span>
                 <p className={`text-[0.7rem] mt-1 ${isMine ? "text-primary-foreground/70" : "text-muted-foreground"
                     }`}>
                     {formatHours(message.timestamp)}

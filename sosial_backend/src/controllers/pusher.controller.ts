@@ -6,7 +6,6 @@ import { pusher } from "../config/pusher";
 export const pusherAuthController = async (req: Request, res: Response) => {
     try {
         const { socketID, channelName, socket_id } = req.body
-        console.log(socket_id);
 
         const userLogin = getUserLogin(req)
 
@@ -16,7 +15,8 @@ export const pusherAuthController = async (req: Request, res: Response) => {
             user_id: String(userLogin.userID),
             user_info: {
                 name: userLogin.username,
-                email: userLogin.email
+                email: userLogin.email,
+                avatar: userLogin.profilePicture
             }
         })
 

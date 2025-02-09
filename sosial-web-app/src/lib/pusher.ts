@@ -14,6 +14,8 @@ export const pusherClient = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!
     forceTLS: true,
     authEndpoint: `${cleanEnv(process.env.NEXT_PUBLIC_API_URL!)}/pusher/auth`,
     auth: headers,
+    enabledTransports: ["ws", "wss"],
+    disabledTransports: ["sockjs", "xhr_polling"],
     activityTimeout: 60000,
     pongTimeout: 30000,
     disableStats: true

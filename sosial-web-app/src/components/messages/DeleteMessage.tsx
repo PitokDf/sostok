@@ -1,10 +1,10 @@
 import api from "@/config/axios.config";
 import { DropdownMenuItem } from "../ui/DropdownMenu";
 
-const DeleteMessageButton: React.FC<{ conversationID: string, messageID: number }> = ({ conversationID, messageID }) => {
+const DeleteMessageButton: React.FC<{ messageID: number }> = ({ messageID }) => {
     const handleDelete = async () => {
         try {
-            await api.delete(`conversations/${conversationID}/message/${messageID}`)
+            await api.delete(`/messages/${messageID}`)
         } catch (error) {
             console.log(error);
         }

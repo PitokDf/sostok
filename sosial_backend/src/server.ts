@@ -12,6 +12,7 @@ import cors from "cors";
 import likeRouter from "./routes/like.routes";
 import pusherRoute from "./routes/pusher.routes";
 import conversationRoute from "./routes/conversation.routes";
+import messageRouter from "./routes/message.routes";
 
 
 dotenv.config();
@@ -25,7 +26,7 @@ app.use(cookieParser()); // untuk parsing cookies pada request
 app.use(compression()); // kompresi response json agar lebih kecil
 app.use(morgan("dev")); // nampilin log request yang masuk pada console
 
-process.env.NODE_ENV === "production" && app.use(express.static(path.join(__dirname, '../public')));
+process.env.NODE_ENV === "development" && app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json()); // parse request body jadi json
 
 app.use("/api/v1/pusher", pusherRoute)
@@ -33,6 +34,7 @@ app.use("/api/v1/auth", authRouter); // routing untuk endpoint authentication
 app.use("/api/v1/conversations", conversationRoute)
 app.use("/api/v1/follow", followRoute); // routing untuk endpoint follows
 app.use("/api/v1/likes/", likeRouter); // routing untuk endpoint likes
+app.use("/api/v1/messages/", messageRouter); // routing untuk endpoint messages
 app.use("/api/v1/posts", postRouter); // routing untuk endpoint posts
 app.use("/api/v1/users/", userRouter); // routing untuk endpoint users
 

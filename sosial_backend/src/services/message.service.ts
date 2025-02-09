@@ -6,7 +6,8 @@ export const getMessageService = async (conversationID: string) => {
 
     const messages = await prisma.message.findMany({
         where: { conversationID },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "desc" },
+        take: 35
     })
 
     return messages
@@ -30,8 +31,19 @@ export const deleteMessageService = async (id: number) => {
     if (!id) throw new AppError("No provide Message id", 400)
 
     const deletedMessage = await prisma.message.delete({
-        where: { id }
+        where: { id },
+        include: { conversation: { select: { id: true } } }
     })
 
     return deletedMessage
+}
+
+export const editMessageService = async (id: number, text: string) => {
+    if (!id) throw new AppError("No provide messageID", 400)
+    const editedMessage = await prisma.message.update({
+        data: { text },
+        where: { id }
+    })
+
+    return editedMessage
 }

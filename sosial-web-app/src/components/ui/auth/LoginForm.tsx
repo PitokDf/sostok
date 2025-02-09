@@ -49,6 +49,7 @@ export default function LoginForm() {
                     id="email"
                     name="email"
                     type="email"
+                    required
                 />
             </div>
 
@@ -59,6 +60,7 @@ export default function LoginForm() {
                     value={data.password}
                     id="password"
                     type="password"
+                    required
                     onChange={e => setData({ ...data, password: e.target.value })}
                     placeholder="Enter your password"
                 />

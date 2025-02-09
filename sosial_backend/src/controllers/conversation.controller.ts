@@ -3,6 +3,7 @@ import { handleError } from "../utils/handle_error";
 import { responseApi } from "../types/response_type";
 import { getUserLogin } from "../utils/session";
 import { getAllConversationService, initiateConversationService } from "../services/conversation.service";
+import { pusher } from "../config/pusher";
 
 export const getAllConversationController = async (req: Request, res: Response<responseApi>) => {
     try {
@@ -67,6 +68,36 @@ export const initiateConversationController = async (req: Request, res: Response
             data: conversation
         })
 
+    } catch (error) {
+        return handleError(error, res)
+    }
+}
+
+export const typingHandler = async (req: Request, res: Response<responseApi>) => {
+    try {
+        const { conversationID } = req.params
+        const user = await getUserLogin(req)
+        await pusher.trigger(`chats-${conversationID}`, 'typing', { userID: user.userID })
+        return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            msg: "berhasil metriger"
+        })
+    } catch (error) {
+        return handleError(error, res)
+    }
+}
+
+export const stopTypingHandler = async (req: Request, res: Response<responseApi>) => {
+    try {
+        const { conversationID } = req.params
+        const user = await getUserLogin(req)
+        await pusher.trigger(`chats-${conversationID}`, 'stop-typing', { userID: user.userID })
+        return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            msg: "berhasil metriger"
+        })
     } catch (error) {
         return handleError(error, res)
     }

@@ -2,34 +2,30 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/Input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
-import { Send, Phone, Video, X, Search, MoreVertical, Loader2 } from "lucide-react"
+import { Search } from "lucide-react"
 import { ScrollArea } from "@/components/ui/ScrollArea"
 import { usePusherChannel } from "@/hooks/usePusherChanel"
 import api from "@/config/axios.config"
 import { ListConversation, Message } from "@/lib/types"
-import MessageBuble from "@/components/messages/MessageBuble"
 import ChatListItem from "@/components/messages/ChatListItem"
-import { getConversationList, sendMessage } from "@/lib/api-services"
-import ProfilePicture from "@/components/ProfilePicture"
-import { getFromLocalStorage, removeFromLocaleStorage, storeToLocalStorage } from "@/lib/storage"
-import { encrypt } from "@/utils/enkripsi"
+import { getConversationList } from "@/lib/api-services"
+import { getFromLocalStorage } from "@/lib/storage"
+import ChatInput from "@/components/messages/ChatInput"
+import ChatHeader from "@/components/messages/ChatHeader"
+import MessageArea from "@/components/messages/MessageArea"
 
 export default function MessagesPage() {
     const user = getFromLocalStorage('user')
     const initiateConversation = getFromLocalStorage("selectedChat")
-
     const [listConversations, setListConversations] = useState<ListConversation[]>([])
     const [selectedChat, setSelectedChat] = useState<any>(initiateConversation ?? null)
-    const [messageInput, setMessageInput] = useState("")
     const [searchQuery, setSearchQuery] = useState("")
     const [isMobileListVisible, setIsMobileListVisible] = useState(initiateConversation ? false : true)
     const [messages, setMessages] = useState<Message[]>([])
-    const [isSending, setIsSending] = useState(false)
-
-    // const notificationdAudioRef = useRef<HTMLAudioElement>(new Audio('/sounds/message-notification.mp3'))
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+    let notificationAudioRef = useRef<HTMLAudioElement | null>(null);
 
     const fetchConversation = async () => {
         const res = await getConversationList();
@@ -41,8 +37,11 @@ export default function MessagesPage() {
     }
 
     useEffect(() => {
-        fetchConversation()
-        document.title = "Chats - Sostok"
+        if (typeof window !== "undefined") {
+            fetchConversation()
+            document.title = "Chats - Sostok"
+            notificationAudioRef.current = new Audio("/sounds/message-notification.mp3")
+        }
     }, [])
 
     useEffect(() => {
@@ -50,16 +49,23 @@ export default function MessagesPage() {
         fetchMessage(selectedChat.conversationID);
     }, [selectedChat])
 
-    const messagesEndRef = useRef<HTMLDivElement>(null)
 
-    usePusherChannel(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'delete-message', (data: Message) => {
+    usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'delete-message', (data: Message) => {
         fetchConversation()
         setMessages(messages.filter(msg => msg.id !== data.id))
     })
 
-    usePusherChannel(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'new-message', (data: Message) => {
+    usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'edit-message', (data: Message) => {
         fetchConversation()
-        // useRef<HTMLAudioElement>(new Audio('/sounds/message-notification.mp3')).current.play().then().catch(error => console.log(error))
+        setMessages(prev => prev.map(msg =>
+            msg.id == data.id ? { ...msg, content: data.content } : msg
+        ))
+        // fetchMessage(selectedChat.conversationID)
+    })
+
+    usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'new-message', (data: Message) => {
+        fetchConversation()
+        user.userID !== data.isMine && notificationAudioRef.current?.play()
         setMessages(prev => [
             ...prev, data
         ])
@@ -81,23 +87,6 @@ export default function MessagesPage() {
         window.addEventListener('resize', scrollToBottom);
         return () => window.removeEventListener('resize', scrollToBottom);
     }, [scrollToBottom]);
-
-    const handleSendMessage = async (e: React.FormEvent) => {
-        e.preventDefault()
-
-        if (!messageInput.trim() || !selectedChat) return;
-
-        try {
-            setIsSending(true)
-            await sendMessage(selectedChat.conversationID, { content: encrypt(messageInput), receiverID: selectedChat.receiverID })
-            // useRef<HTMLAudioElement>(new Audio('/sounds/message-send.mp3')).current.play().then().catch(error => console.log(error))
-            removeFromLocaleStorage('selectedChat')
-            setMessageInput("")
-        } catch (error) {
-            console.log(error);
-        } finally { setIsSending(false) }
-
-    }
 
     const filteredChats = listConversations!.filter(chat =>
         chat.username.toLowerCase().includes(searchQuery.toLowerCase())
@@ -146,68 +135,9 @@ export default function MessagesPage() {
                     {selectedChat ? (
                         <>
                             {/* Chat Header */}
-                            <div className="p-4 border-b flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="lg:hidden"
-                                        onClick={toggleMobileView}
-                                    >
-                                        <X className="h-5 w-5" />
-                                    </Button>
-                                    <div className="relative">
-                                        <ProfilePicture user={{ username: selectedChat.username, profilePicture: selectedChat.avatar }} />
-                                        {selectedChat.online && (
-                                            <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-background" />
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">{selectedChat.username}</p>
-                                        {selectedChat.online && (
-                                            <p className="text-xs text-muted-foreground">Online</p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                    <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                                        <Phone className="h-5 w-5" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-                                        <Video className="h-5 w-5" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreVertical className="h-5 w-5" />
-                                    </Button>
-                                </div>
-                            </div>
-
-                            {/* Messages */}
-                            <ScrollArea className="flex-1 p-4 max-h-[calc(100vh-16rem)] h-full max-w-[99vw] md:max-h-[calc(100vh-16rem)]">
-                                <div className="space-y-4">
-                                    {messages.map((message) => (
-                                        <MessageBuble key={message.id} message={message} conversationID={selectedChat.conversationID} />
-                                    ))}
-                                    <div ref={messagesEndRef} />
-                                </div>
-                            </ScrollArea>
-
-                            {/* Message Input */}
-                            <form onSubmit={handleSendMessage} className="p-4 border-t">
-                                <div className="flex space-x-2">
-                                    <Input
-                                        placeholder="Type a message..."
-                                        value={messageInput}
-                                        onChange={(e) => setMessageInput(e.target.value)}
-                                        className="flex-1"
-                                    />
-                                    <Button type="submit" size="icon" disabled={!messageInput.trim() || isSending}>
-                                        {isSending ? <Loader2 className="animate-spin" /> :
-                                            <Send className="h-5 w-5" />
-                                        }
-                                    </Button>
-                                </div>
-                            </form>
+                            <ChatHeader selectedChat={selectedChat} toggleMobileView={toggleMobileView} />
+                            <MessageArea messages={messages} />
+                            <ChatInput selectedChat={selectedChat} />
                         </>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full text-center p-4">

@@ -13,7 +13,7 @@ export default function LoginPage() {
             {/* Login Card */}
             <div className="w-full md:max-w-xl flex gap-4 max-w-sm bg-card p-8 rounded-lg shadow-md">
                 <div className="hidden md:flex object-cover max-w-full overflow-hidden flex-1">
-                    <img src="/images/sostok-logo.png" className="object-cover" alt="sostok logo" />
+                    <img src="/images/logo-2.jpg" className="object-cover" alt="sostok logo" />
                 </div>
                 <div className="flex-1">
                     <h2 className="text-2xl font-bold text-primary text-center mb-6">Login</h2>
@@ -27,7 +27,6 @@ export default function LoginPage() {
                     </p>
                 </div>
             </div>
-
         </div>
     );
 }
