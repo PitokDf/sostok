@@ -1,7 +1,6 @@
 'use client'
 
 import { ProfileContent } from "@/components/profile";
-import { useSessionStorage } from "@/hooks/useSessionStorage";
 import { getFromLocalStorage } from "@/lib/storage";
 
 export default function profile() {

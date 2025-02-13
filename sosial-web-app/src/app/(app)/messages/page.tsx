@@ -15,80 +15,65 @@ import { getFromLocalStorage } from "@/lib/storage"
 import ChatInput from "@/components/messages/ChatInput"
 import ChatHeader from "@/components/messages/ChatHeader"
 import MessageArea from "@/components/messages/MessageArea"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 export default function MessagesPage() {
     const user = getFromLocalStorage('user')
-    const initiateConversation = getFromLocalStorage("selectedChat")
-    const [listConversations, setListConversations] = useState<ListConversation[]>([])
+    const initiateConversation = getFromLocalStorage("lastSelectedChat")
+    // const [listConversations, setListConversations] = useState<ListConversation[]>([])
     const [selectedChat, setSelectedChat] = useState<any>(initiateConversation ?? null)
     const [searchQuery, setSearchQuery] = useState("")
     const [isMobileListVisible, setIsMobileListVisible] = useState(initiateConversation ? false : true)
-    const [messages, setMessages] = useState<Message[]>([])
-    const messagesEndRef = useRef<HTMLDivElement>(null)
+    // const [messages, setMessages] = useState<Message[]>([])
     let notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+    const queryClient = useQueryClient()
 
-    const fetchConversation = async () => {
-        const res = await getConversationList();
-        setListConversations(res.data)
-    }
-    const fetchMessage = async (conversationID: string) => {
-        const res = await api.get(`/conversations/${conversationID}/message`)
-        setMessages(res.data.data)
-    }
+    const { data: listConversations, isLoading: isConversationLoading } = useQuery<ListConversation[]>({
+        queryKey: ["conversations"],
+        queryFn: async () => {
+            return (await api.get(`/conversations`)).data.data
+        }
+    })
+
+    const { data: messages, isLoading: isMessageLoading } = useQuery<Message[]>({
+        queryKey: ["messages", selectedChat?.conversationID],
+        queryFn: async () => {
+            if (!selectedChat) return [];
+            const res = await api.get(`conversations/${selectedChat?.conversationID}/message`)
+            return res.data.data
+        }
+    })
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            fetchConversation()
             document.title = "Chats - Sostok"
             notificationAudioRef.current = new Audio("/sounds/message-notification.mp3")
         }
-    }, [])
-
-    useEffect(() => {
-        if (!selectedChat) return;
-        fetchMessage(selectedChat.conversationID);
-    }, [selectedChat])
-
+    }, [listConversations])
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'delete-message', (data: Message) => {
-        fetchConversation()
-        setMessages(messages.filter(msg => msg.id !== data.id))
+        queryClient.invalidateQueries({ queryKey: ["conversations"] })
+        queryClient.setQueryData([], (oldData: Message[]) => oldData ? oldData.filter(msg => msg.id !== data.id) : []);
     })
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'edit-message', (data: Message) => {
-        fetchConversation()
-        setMessages(prev => prev.map(msg =>
-            msg.id == data.id ? { ...msg, content: data.content } : msg
-        ))
-        // fetchMessage(selectedChat.conversationID)
+        queryClient.invalidateQueries({ queryKey: ["conversations"] })
+        queryClient.setQueryData(["messages", selectedChat.conversationID], (oldData: Message[]) =>
+            oldData ? oldData.map((msg) => msg.id === data.id ? { ...msg, content: data.content } : msg) : []
+        )
     })
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'new-message', (data: Message) => {
-        fetchConversation()
+        queryClient.invalidateQueries({ queryKey: ["conversations"] })
         user.userID !== data.isMine && notificationAudioRef.current?.play()
-        setMessages(prev => [
-            ...prev, data
-        ])
+
+        queryClient.setQueryData(["messages", selectedChat.conversationID], (oldData: Message[]) =>
+            oldData ? [...oldData, data] : [data]
+        )
     })
+    if (isConversationLoading) return <h1>Loading...</h1>
 
-    const scrollToBottom = useCallback(() => {
-        messagesEndRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-        });
-    }, []);
-
-    useEffect(() => {
-        scrollToBottom()
-    }, [messages, scrollToBottom])
-
-    // Handle resize events
-    useEffect(() => {
-        window.addEventListener('resize', scrollToBottom);
-        return () => window.removeEventListener('resize', scrollToBottom);
-    }, [scrollToBottom]);
-
-    const filteredChats = listConversations!.filter(chat =>
+    const filteredChats = listConversations!.filter((chat: any) =>
         chat.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
@@ -136,7 +121,7 @@ export default function MessagesPage() {
                         <>
                             {/* Chat Header */}
                             <ChatHeader selectedChat={selectedChat} toggleMobileView={toggleMobileView} />
-                            <MessageArea messages={messages} />
+                            <MessageArea messages={messages!} isLoading={isMessageLoading} />
                             <ChatInput selectedChat={selectedChat} />
                         </>
                     ) : (

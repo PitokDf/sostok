@@ -2,6 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
+import LogoutButton from "./ui/LogoutButton";
 
 export default function AppBar() {
     const [showHeader, setShowHeader] = useState(true);
@@ -39,7 +40,10 @@ export default function AppBar() {
                             </span>
                         </h1>
                     </div>
-                    <Bell className="fill-current w-5 h-5" />
+                    <div className="flex gap-2 items-center">
+                        <Bell className="fill-current w-5 h-5" />
+                        <LogoutButton />
+                    </div>
                 </div>
             </nav>
         </header>

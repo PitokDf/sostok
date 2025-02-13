@@ -1,33 +1,22 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import api from "@/config/axios.config"
-import { Profile } from "@/lib/types"
 import ProfileHeader from "./ProfileHeader"
 import ProfileAction from "./ProfileAction"
 import ProfileTabs from "./ProfileTabs"
+import { useQuery } from "@tanstack/react-query"
 
 export function ProfileContent({ username }: { username: string }) {
-    const [profile, setProfile] = useState<Profile | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    const getUserProfile = async (username: string) => {
-        try {
-            const res = await api.get(`users/${username}/profile`)
-            const profile = res.data.data
-            setProfile(profile)
-        } catch (error) {
-            console.log(error);
-        } finally { setIsLoading(false) }
-    }
-
-    useEffect(() => {
-        getUserProfile(username)
-    }, [username, setIsLoading])
+    const { data, isLoading } = useQuery({
+        queryKey: ["profile"],
+        queryFn: async () => {
+            return (await api.get(`users/${username}/profile`)).data.data
+        }
+    })
 
     if (isLoading) return <h1>Loading...</h1>
 
-    if (!profile) {
+    if (!data) {
         return (
             <div className="container max-w-2xl py-8 text-center">
                 <h1 className="text-2xl font-bold mb-4">Profile not found</h1>
@@ -38,13 +27,13 @@ export function ProfileContent({ username }: { username: string }) {
     return (
         <div className="px-4 md:px-8 mb-16 container md:max-w-2xl">
             {/* Profile Header */}
-            <ProfileHeader profile={profile} />
+            <ProfileHeader profile={data} />
 
             {/* Profile Action */}
-            <ProfileAction profile={profile} />
+            <ProfileAction profile={data} />
 
             {/* Posts Grid */}
-            <ProfileTabs posts={profile.posts} ownProfile={profile.isOwnProfile} savedPost={profile.savedPost} />
+            <ProfileTabs posts={data.posts} ownProfile={data.isOwnProfile} savedPost={data.savedPost} />
         </div>
     )
 }

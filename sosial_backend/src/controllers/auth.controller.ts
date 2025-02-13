@@ -3,14 +3,14 @@ import { handleError } from "../utils/handle_error"
 import { responseApi } from "../types/response_type";
 import { createUserService, findEmail } from "../services/user.service";
 import { compare } from "bcryptjs"
-import { generateRefreshToken, generateToken, getMeInfoService, hashPassword, verifyRefreshToken } from "../services/auth.service";
+import { generateToken, getMeInfoService, hashPassword, verifyAccessToken } from "../services/auth.service";
 import { parseCookie } from "../utils/parse_cookie";
 import { getUserLogin } from "../utils/session";
 import { setCookie } from "../utils/set_cookie";
 
 export const loginController = async (req: Request, res: Response<responseApi>) => {
     try {
-        let accessTokenStored = req.headers.cookie?.split(";")[1];
+        let accessTokenStored = req.headers.cookie?.split(";")[0];
         if (accessTokenStored) {
             accessTokenStored.split("=")[1]
             if (accessTokenStored) return res.status(403).json({
@@ -45,9 +45,7 @@ export const loginController = async (req: Request, res: Response<responseApi>) 
         }
 
         const accessToken = await generateToken(payload);
-        const refreshToken = await generateRefreshToken(payload);
-        setCookie('accessToken', accessToken, 3600000, res)
-        setCookie('refreshToken', refreshToken, 604800000, res)
+        setCookie('accessToken', accessToken, (7 * 24 * 60 * 60 * 1000), res)
 
         return res.status(200).json({
             success: true,
@@ -76,11 +74,7 @@ export const registerController = async (req: Request, res: Response<responseApi
         }
 
         const accessToken = await generateToken(payload);
-        const refreshToken = await generateRefreshToken(payload);
-        console.log(process.env.NODE_ENV);
-
-        res.cookie("accessToken", accessToken, { maxAge: 3600000, httpOnly: true, sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", secure: process.env.NODE_ENV === "production" });
-        res.cookie("refreshToken", refreshToken, { maxAge: 604800000, httpOnly: true, sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", secure: process.env.NODE_ENV === "production" })
+        setCookie('accessToken', accessToken, (7 * 24 * 60 * 60 * 1000), res)
         return res.status(201).json({
             success: true, statusCode: 201, msg: "Registered successfully",
             data: payload
@@ -93,7 +87,6 @@ export const registerController = async (req: Request, res: Response<responseApi
 export const logoutController = async (req: Request, res: Response<responseApi>) => {
     try {
         res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
 
         return res.status(200).json({
             success: true,
@@ -102,36 +95,6 @@ export const logoutController = async (req: Request, res: Response<responseApi>)
         })
     } catch (error) {
         handleError(error, res)
-    }
-}
-
-export const refreshTokenController = async (req: Request, res: Response<responseApi>) => {
-    try {
-        const refreshToken = parseCookie(req.headers.cookie, "refreshToken");
-
-        if (!refreshToken) return res.status(401).json({ success: false, statusCode: 401, msg: "no token" });
-
-        const decode = await verifyRefreshToken(refreshToken);
-        const newAccessToken = await generateToken({
-            userID: decode.userID,
-            username: decode.username,
-            bio: decode.bio,
-            email: decode.email,
-            isVerified: decode.isVerified,
-            profilePicture: decode.profilePicture
-        });
-
-        res.cookie("accessToken", newAccessToken,
-            { maxAge: 3600000, httpOnly: true, sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", secure: process.env.NODE_ENV === "production" }
-        );
-
-        return res.status(200).json({
-            success: true,
-            statusCode: 200,
-            msg: "Berhasil merefresh akses token"
-        })
-    } catch (error) {
-        return handleError(error, res)
     }
 }
 

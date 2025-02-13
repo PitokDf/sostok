@@ -26,25 +26,7 @@ export const generateToken = async (payload: Payload) => {
     );
 }
 
-export const generateRefreshToken = async (payload: Payload) => {
-    return sign(payload, jwt_config.apiToken!,
-        { expiresIn: jwt_config.refreshTokenExpireIn, issuer: jwt_config.issuer, audience: jwt_config.audience }
-    );
-}
-
 export const verifyAccessToken = async (token: string) => {
-    return new Promise((resolve, reject) => {
-        verify(token, jwt_config.apiToken!, {
-            issuer: jwt_config.issuer,
-            audience: jwt_config.audience,
-        }, (err, decode) => {
-            if (err) return reject("Invalid or expire token");
-            resolve(decode)
-        })
-    })
-}
-
-export const verifyRefreshToken = async (token: string) => {
     try {
         const decode = verify(token, jwt_config.apiToken!,
             { issuer: jwt_config.issuer, audience: jwt_config.audience }

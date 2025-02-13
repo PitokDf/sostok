@@ -2,14 +2,14 @@ import { Request, Response } from "express";
 import { responseApi } from "../types/response_type";
 import { handleError } from "../utils/handle_error";
 import { findUserId, getAllUserService, updateUserService, userMeService } from "../services/user.service";
-import { hashPassword, Payload, verifyRefreshToken } from "../services/auth.service";
+import { hashPassword, Payload, verifyAccessToken } from "../services/auth.service";
 import { deleteFile } from "../utils/manage_file";
 
 export const profileController = async (req: Request, res: Response<responseApi>) => {
     try {
-        const refreshToken = req.cookies.refreshToken;;
+        const accessToken = req.cookies.accessToken;;
         let userLoggin;
-        if (refreshToken) userLoggin = await verifyRefreshToken(refreshToken)
+        if (accessToken) userLoggin = await verifyAccessToken(accessToken)
 
         const { username } = req.params;
         const user = await userMeService(username || userLoggin?.username!);
@@ -25,8 +25,8 @@ export const profileController = async (req: Request, res: Response<responseApi>
             followings: user.followers.length,
             followers: user.followings.length,
             likeReceiveCount: user.likes.length,
-            isOwnProfile: !refreshToken ? false : userLoggin?.userID === user.id,
-            isFollowing: !refreshToken ? false : user.followings.some((v) => v.followerID === (userLoggin! as Payload).userID),
+            isOwnProfile: !accessToken ? false : userLoggin?.userID === user.id,
+            isFollowing: !accessToken ? false : user.followings.some((v) => v.followerID === (userLoggin! as Payload).userID),
             posts: user.posts.map((post) => ({
                 id: post.id,
                 images: post.imageUrl.map((image) => image.fileLink),

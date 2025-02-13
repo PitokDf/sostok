@@ -9,7 +9,7 @@ export default function InitiateMessageButton({ targetID }: { targetID: number }
     const handleIniateMessage = async () => {
         try {
             const res = await api.post('/conversations/initiate', { targetUserID: targetID })
-            storeToLocalStorage('selectedChat', res.data.data)
+            storeToLocalStorage('lastSelectedChat', res.data.data)
 
             router.push("/messages")
         } catch (error) {

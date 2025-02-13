@@ -7,3 +7,4 @@ public/posts/**
 !public/posts/**.txt
 public/profiles/**
 !public/profiles/**.txt
+account.json

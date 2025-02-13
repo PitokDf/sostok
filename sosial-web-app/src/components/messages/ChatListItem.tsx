@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/Avatar";
 import { formatHours } from "@/utils/formatTanggal";
 import ProfilePicture from "../ProfilePicture";
 import { storeToLocalStorage } from "@/lib/storage";
@@ -32,7 +31,7 @@ export default function ChatListItem({ chat, setIsMobileListVisible, setSelected
                 <ProfilePicture user={{ username: chat.username, profilePicture: chat.avatar }} />
             </div>
             <div className="flex-1 min-w-0" onClick={() => {
-                storeToLocalStorage('lastSelectedMessage', chat)
+                storeToLocalStorage('lastSelectedChat', chat)
                 setSelectedChat(chat)
                 setIsMobileListVisible(false)
             }}>

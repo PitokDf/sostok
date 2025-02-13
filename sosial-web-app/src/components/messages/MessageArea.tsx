@@ -3,7 +3,9 @@ import { ScrollArea } from "../ui/ScrollArea";
 import MessageBuble from "./MessageBuble";
 import { Message } from "@/lib/types";
 
-export default function MessageArea({ messages }: { messages: Message[] }) {
+export default function MessageArea({ messages, isLoading }: { messages: Message[], isLoading: boolean }) {
+    if (isLoading) return <h1>Loading...</h1>
+
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = useCallback(() => {

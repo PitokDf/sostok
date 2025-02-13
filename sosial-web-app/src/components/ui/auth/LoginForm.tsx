@@ -6,6 +6,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "../Input";
 import { Button } from "../Button";
 import { storeToLocalStorage } from "@/lib/storage";
+import { Alert, AlertDescription, AlertTitle } from "../Alert";
 
 interface LoginData {
     email: string;
@@ -15,6 +16,7 @@ interface LoginData {
 export default function LoginForm() {
     const [data, setData] = useState<LoginData>({ email: "", password: "" });
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [errorMsg, setErrorMsg] = useState("")
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -32,50 +34,60 @@ export default function LoginForm() {
             if (response.status == 200) {
                 storeToLocalStorage('user', response.data.data)
             }
-        } catch (error) {
+            window.location.href = "/"
+        } catch (error: any) {
+            const errorMsg = error.response.data.msg
+            setErrorMsg(errorMsg ?? "")
             console.log(error);
         } finally { setIsLoading(false) }
     }
 
     return (
-        <form className="space-y-4" onSubmit={handleFormSubmit}>
-            {/* Email Input */}
-            <div>
-                <Label htmlFor="email" >Enter email</Label>
-                <Input
-                    value={data.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                />
-            </div>
+        <>
+            {errorMsg &&
+                <Alert color="red" className="mb-3 bg-red-500 bg-opacity-25 text-red-100">
+                    <AlertDescription>{errorMsg}</AlertDescription>
+                </Alert>
+            }
+            <form className="space-y-4" onSubmit={handleFormSubmit}>
+                {/* Email Input */}
+                <div>
+                    <Label htmlFor="email" >Enter email</Label>
+                    <Input
+                        value={data.email}
+                        onChange={handleInputChange}
+                        placeholder="Enter your email"
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                    />
+                </div>
 
-            {/* Password Input */}
-            <div>
-                <Label htmlFor="password">Password </Label>
-                <Input
-                    value={data.password}
-                    id="password"
-                    type="password"
-                    required
-                    onChange={e => setData({ ...data, password: e.target.value })}
-                    placeholder="Enter your password"
-                />
-            </div>
+                {/* Password Input */}
+                <div>
+                    <Label htmlFor="password">Password </Label>
+                    <Input
+                        value={data.password}
+                        id="password"
+                        type="password"
+                        required
+                        onChange={e => setData({ ...data, password: e.target.value })}
+                        placeholder="Enter your password"
+                    />
+                </div>
 
-            {/* Login Button */}
-            <div>
-                <Button
-                    type="submit"
-                    className={`w-full`}
-                    disabled={isLoading}
-                >
-                    {isLoading ? "Loading..." : "Login"}
-                </Button>
-            </div>
-        </form>
+                {/* Login Button */}
+                <div>
+                    <Button
+                        type="submit"
+                        className={`w-full`}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Loading..." : "Login"}
+                    </Button>
+                </div>
+            </form>
+        </>
     );
 }
