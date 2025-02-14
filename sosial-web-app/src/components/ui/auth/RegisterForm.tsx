@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import api from "@/config/axios.config";
 import { storeToLocalStorage } from "@/lib/storage";
 import { Alert, AlertDescription } from "../Alert";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
     const [data, setData] = useState({
@@ -14,6 +15,8 @@ export default function RegisterForm() {
         password: "",
         username: ""
     })
+
+    const router = useRouter()
 
     const [errors, setError] = useState({
         username: "",
@@ -36,7 +39,8 @@ export default function RegisterForm() {
             storeToLocalStorage("user", res.data.data)
             setSuccessMsg(res.data.msg)
             setError({ email: "", password: "", username: "" })
-            window.location.href = "/"
+            router.push("/")
+            // window.location.href = "/"
         } catch (error: any) {
             console.log(error);
             if (error.status === 400) {

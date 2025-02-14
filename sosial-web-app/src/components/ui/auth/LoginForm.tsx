@@ -7,6 +7,7 @@ import { Input } from "../Input";
 import { Button } from "../Button";
 import { storeToLocalStorage } from "@/lib/storage";
 import { Alert, AlertDescription, AlertTitle } from "../Alert";
+import { useRouter } from "next/navigation";
 
 interface LoginData {
     email: string;
@@ -17,6 +18,7 @@ export default function LoginForm() {
     const [data, setData] = useState<LoginData>({ email: "", password: "" });
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [errorMsg, setErrorMsg] = useState("")
+    const router = useRouter()
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -34,7 +36,8 @@ export default function LoginForm() {
             if (response.status == 200) {
                 storeToLocalStorage('user', response.data.data)
             }
-            window.location.href = "/"
+            router.push("/")
+            // window.location.href = "/"
         } catch (error: any) {
             const errorMsg = error.response.data.msg
             setErrorMsg(errorMsg ?? "")
