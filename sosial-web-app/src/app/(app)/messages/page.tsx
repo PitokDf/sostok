@@ -121,7 +121,7 @@ export default function MessagesPage() {
                         <>
                             {/* Chat Header */}
                             <ChatHeader selectedChat={selectedChat} toggleMobileView={toggleMobileView} />
-                            <MessageArea messages={messages!} isLoading={isMessageLoading} />
+                            <MessageArea messages={messages!} selectedChat={selectedChat} isLoading={isMessageLoading} />
                             <ChatInput selectedChat={selectedChat} />
                         </>
                     ) : (

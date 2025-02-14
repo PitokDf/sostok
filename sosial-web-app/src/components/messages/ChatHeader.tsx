@@ -9,16 +9,16 @@ export default function ChatHeader({ toggleMobileView, selectedChat }: { toggleM
     const user = getFromLocalStorage('user')
     const [typing, setIsTyping] = useState(false)
 
-    usePusherChannel<{ userID: string }>(`chats-${selectedChat.conversationID}`, 'typing', ({ userID }) => {
-        if (userID !== user.userID) { setIsTyping(true); }
-    }
-    );
+    // usePusherChannel<{ userID: string }>(`chats-${selectedChat.conversationID}`, 'typing', ({ userID }) => {
+    //     if (userID !== user.userID) { setIsTyping(true); }
+    // }
+    // );
 
-    usePusherChannel<{ userID: string }>(`chats-${selectedChat.conversationID}`, 'stop-typing',
-        ({ userID }) => {
-            if (userID !== user.userID) { setIsTyping(false); }
-        }
-    );
+    // usePusherChannel<{ userID: string }>(`chats-${selectedChat.conversationID}`, 'stop-typing',
+    //     ({ userID }) => {
+    //         if (userID !== user.userID) { setIsTyping(false); }
+    //     }
+    // );
     return (
         <div className="p-4 border-b flex items-center justify-between">
             <div className="flex items-center space-x-3">

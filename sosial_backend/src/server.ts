@@ -17,6 +17,7 @@ import messageRouter from "./routes/message.routes";
 
 dotenv.config();
 const app = express();
+console.log(process.env.FRONTEND_URL);
 
 app.use(cors({
     credentials: true,
