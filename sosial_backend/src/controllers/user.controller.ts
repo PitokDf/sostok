@@ -1,9 +1,36 @@
 import { Request, Response } from "express";
 import { responseApi } from "../types/response_type";
 import { handleError } from "../utils/handle_error";
-import { findUserId, getAllUserService, updateUserService, userMeService } from "../services/user.service";
+import { findUserId, getAllUserService, searchUserProfileService, updateUserService, userMeService } from "../services/user.service";
 import { hashPassword, Payload, verifyAccessToken } from "../services/auth.service";
 import { deleteFile } from "../utils/manage_file";
+
+const mapProfile = (user: any, accessToken: string, userLoggin: any) => {
+    return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
+        isVerified: user.isVerified,
+        postsCount: user?.posts?.length,
+        followings: user.followers.length,
+        followers: user.followings.length,
+        likeReceiveCount: user?.likes?.length,
+        isOwnProfile: !accessToken ? false : userLoggin?.userID === user.id,
+        isFollowing: !accessToken ? false : user.followings.some((v: any) => v.followerID === (userLoggin! as Payload).userID),
+        posts: user?.posts?.map((post: any) => ({
+            id: post.id,
+            images: post.imageUrl.map((image: any) => image.fileLink),
+            likeCount: post.likes.length,
+            commentCount: post.comments.length
+        })),
+        savedPost: user?.savedPosts?.map((savedPost: any) => ({
+            id: savedPost.id,
+            imageUrl: savedPost.post.imageUrl.map((url: any) => url.fileLink)[0]
+        }))
+    }
+}
 
 export const profileController = async (req: Request, res: Response<responseApi>) => {
     try {
@@ -14,30 +41,7 @@ export const profileController = async (req: Request, res: Response<responseApi>
         const { username } = req.params;
         const user = await userMeService(username || userLoggin?.username!);
 
-        const profile = {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            bio: user.bio,
-            profilePicture: user.profilePicture,
-            isVerified: user.isVerified,
-            postsCount: user.posts.length,
-            followings: user.followers.length,
-            followers: user.followings.length,
-            likeReceiveCount: user.likes.length,
-            isOwnProfile: !accessToken ? false : userLoggin?.userID === user.id,
-            isFollowing: !accessToken ? false : user.followings.some((v) => v.followerID === (userLoggin! as Payload).userID),
-            posts: user.posts.map((post) => ({
-                id: post.id,
-                images: post.imageUrl.map((image) => image.fileLink),
-                likeCount: post.likes.length,
-                commentCount: post.comments.length
-            })),
-            savedPost: user.savedPosts.map(savedPost => ({
-                id: savedPost.id,
-                imageUrl: savedPost.post.imageUrl.map(url => url.fileLink)[0]
-            }))
-        }
+        const profile = mapProfile(user, accessToken, userLoggin)
         return res.status(200).json({
             success: true,
             statusCode: 200,
@@ -90,6 +94,28 @@ export const updateUserController = async (req: Request, res: Response<responseA
             msg: "Berhasil mengupdate profile",
             data: updatedUser
         });
+    } catch (error) {
+        return handleError(error, res)
+    }
+}
+
+export const searchUserProfilesController = async (req: Request, res: Response<responseApi>) => {
+    try {
+        const { query } = req.params
+        const accessToken = req.cookies.accessToken;;
+        const userLoggin = await verifyAccessToken(accessToken);
+
+        const users = await searchUserProfileService(query)
+        const userMap = users.map((user) => (
+            mapProfile(user, accessToken, userLoggin)
+        ))
+
+        return res.status(200).json({
+            success: true,
+            statusCode: 200,
+            msg: "Berhasil mendapatkan data.",
+            data: userMap
+        })
     } catch (error) {
         return handleError(error, res)
     }

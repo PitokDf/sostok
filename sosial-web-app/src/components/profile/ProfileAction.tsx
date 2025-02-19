@@ -21,7 +21,7 @@ export default function ProfileAction({ profile }: { profile: Profile }) {
                 </>
             ) : (
                 <>
-                    <FollowAction following={profile.isFollowing} userID={profile.id} />
+                    <FollowAction className="flex-1" following={profile.isFollowing} userID={profile.id} />
                     <InitiateMessageButton targetID={profile.id} />
                 </>
             )}

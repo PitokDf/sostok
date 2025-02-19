@@ -3,7 +3,7 @@ import { Button } from "../ui/Button";
 import { useState } from "react";
 import api from "@/config/axios.config";
 
-export default function FollowAction({ following, userID }: { following: boolean, userID: number }) {
+export default function FollowAction({ following, userID, className }: { following: boolean, userID: number, className?: string }) {
     const [isFollowing, setIsFollowing] = useState(following)
 
     const handleFollow = async () => {
@@ -16,7 +16,7 @@ export default function FollowAction({ following, userID }: { following: boolean
     }
     return (
         <Button
-            className="w-full flex-1"
+            className={`w-full ${className}`}
             size={"sm"}
             onClick={handleFollow}
             variant={isFollowing ? "secondary" : "default"}

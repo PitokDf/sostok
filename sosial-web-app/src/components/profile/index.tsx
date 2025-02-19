@@ -5,6 +5,7 @@ import ProfileHeader from "./ProfileHeader"
 import ProfileAction from "./ProfileAction"
 import ProfileTabs from "./ProfileTabs"
 import { useQuery } from "@tanstack/react-query"
+import SkeletonProfile from "./Skeleton"
 
 export function ProfileContent({ username }: { username: string }) {
     const { data, isLoading } = useQuery({
@@ -14,7 +15,7 @@ export function ProfileContent({ username }: { username: string }) {
         }
     })
 
-    if (isLoading) return <h1>Loading...</h1>
+    if (isLoading) return <SkeletonProfile />
 
     if (!data) {
         return (
@@ -24,6 +25,7 @@ export function ProfileContent({ username }: { username: string }) {
             </div>
         )
     }
+
     return (
         <div className="px-4 md:px-8 mb-16 container md:max-w-2xl">
             {/* Profile Header */}

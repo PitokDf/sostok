@@ -96,3 +96,22 @@ export const userMeService = async (username: string) => {
 
     return existingUser;
 }
+
+export const searchUserProfileService = async (query: string) => {
+    const user = await prisma.user.findMany({
+        where: {
+            // OR: [{
+            //     username: query,
+            //     bio: query
+            // }],
+            username: {
+                contains: query
+            }
+        },
+        include: {
+            followers: true, followings: true,
+        }
+    })
+
+    return user
+}
