@@ -8,9 +8,10 @@ import { decrypt, encrypt } from "@/utils/enkripsi";
 import api from "@/config/axios.config";
 
 export default function EditMessage({ message }: { message: Message }) {
+    const decryptMsg = decrypt(message.content);
     const [isOpen, setIsOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [messageInput, setMessageInput] = useState(decrypt(message.content))
+    const [messageInput, setMessageInput] = useState(decryptMsg)
     const handleModal = () => setIsOpen(!isOpen)
 
     const handleEditMessage = async (e: FormEvent) => {
@@ -18,11 +19,12 @@ export default function EditMessage({ message }: { message: Message }) {
         if (!messageInput.trim()) return
         try {
             setIsLoading(true)
+            if (decryptMsg === messageInput) return
             await api.put(`/messages/${message.id}`, { content: encrypt(messageInput) })
             setIsOpen(false)
         } catch (error) {
             console.log(error);
-        } finally { setIsLoading(false) }
+        } finally { setIsLoading(false); setIsOpen(false) }
     }
     return (
         <>

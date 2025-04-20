@@ -53,14 +53,16 @@ export default function MessagesPage() {
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'delete-message', (data: Message) => {
         queryClient.invalidateQueries({ queryKey: ["conversations"] })
-        queryClient.setQueryData([], (oldData: Message[]) => oldData ? oldData.filter(msg => msg.id !== data.id) : []);
+        queryClient.setQueryData(["messages", selectedChat.conversationID], (oldData: Message[]) => {
+            return oldData ? oldData.filter(msg => msg.id !== data.id) : []
+        });
     })
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'edit-message', (data: Message) => {
         queryClient.invalidateQueries({ queryKey: ["conversations"] })
-        queryClient.setQueryData(["messages", selectedChat.conversationID], (oldData: Message[]) =>
-            oldData ? oldData.map((msg) => msg.id === data.id ? { ...msg, content: data.content } : msg) : []
-        )
+        queryClient.setQueryData(["messages", selectedChat.conversationID], (oldData: Message[]) => {
+            return oldData ? oldData.map((msg) => msg.id === data.id ? { ...msg, content: data.content, updatedAt: data.updatedAt } : msg) : []
+        })
     })
 
     usePusherChannel<Message>(selectedChat ? `chat-${selectedChat.conversationID}` : '', 'new-message', (data: Message) => {

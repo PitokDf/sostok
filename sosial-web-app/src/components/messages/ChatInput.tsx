@@ -66,22 +66,13 @@ export default function ChatInput({ selectedChat }: { selectedChat: any }) {
                 receiverID: selectedChat.receiverID
             }
         })
-        // try {
-        //     setIsSending(true)
-        //     await sendMessage(selectedChat.conversationID, { content: encrypt(messageInput), receiverID: selectedChat.receiverID })
-        //     sendAudioRef.current?.play()
-        //     setMessageInput("")
-        //     removeFromLocaleStorage("lastSelectedChat")
-        // } catch (error) {
-        //     console.log(error);
-        // } finally { setIsSending(false) }
     }
 
     return (
         <form onSubmit={handleSendMessage} className="p-4 border-t">
             <div className="flex space-x-2">
                 <Input
-                    placeholder="Type a message..."
+                    placeholder={`Send message to ${selectedChat.username}`}
                     value={messageInput}
                     onChange={(e) => { setMessageInput(e.target.value); handleInputChange(e) }}
                     className="flex-1"

@@ -15,6 +15,7 @@ const mapMessage = (message: Message) => {
         receiverID: message.receiverID,
         content: message.text,
         timestamp: message.createdAt,
+        updatedAt: message.updatedAt
     }
 }
 

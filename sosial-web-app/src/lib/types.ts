@@ -108,7 +108,8 @@ export interface Message {
     receiverID: number;
     content: string;
     timestamp: string;
-    user: User
+    user: User,
+    updatedAt: string
 }
 
 export interface ListConversation {

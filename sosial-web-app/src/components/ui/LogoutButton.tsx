@@ -1,12 +1,19 @@
 import api from "@/config/axios.config";
-import { removeFromLocaleStorage } from "@/lib/storage";
+import { getFromLocalStorage, removeFromLocaleStorage } from "@/lib/storage";
 import { Button } from "./Button";
 import { LogOutIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./Dialog";
-import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
+import { useEffect, useState } from "react";
 
 export default function LogoutButton() {
     const [isOpen, setIsOpen] = useState(false)
+    const [user, setUser] = useState("")
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setUser(getFromLocalStorage('user'))
+        }
+    }, [])
     const handleLogout = async () => {
         try {
             await api.post("/auth/logout");
@@ -18,6 +25,7 @@ export default function LogoutButton() {
     }
 
     const handleModal = () => setIsOpen(!isOpen)
+    if (!user) return null;
     return (
         <>
             <Button onClick={handleModal} variant={"link"} className="text-current hover:text-red-600">

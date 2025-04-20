@@ -7,5 +7,6 @@ export const getConversationList = async () => {
 
 export const sendMessage = async (conversationID: string, data: { content: string, receiverID: number }) => {
     const res = await api.post(`/conversations/${conversationID}/message`, data)
+    api.post(`/conversations/${conversationID}/stop-typing`);
     return res.data
 }

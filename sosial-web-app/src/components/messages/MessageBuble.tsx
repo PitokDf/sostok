@@ -11,6 +11,13 @@ import EditMessage from "./EditMessage";
 
 export default function MessageBuble({ message }: { message: Message }) {
     const user = getFromLocalStorage('user')
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const timeStamp = new Date(message.timestamp);
+    timeStamp.setHours(0, 0, 0, 0)
+    const differenceDay = ((today as any) - (timeStamp as any)) / (24 * 60 * 60 * 1000)
+
     const [copied, setCopied] = useState(false)
     const handleCopy = async (text: any) => {
         try {
@@ -36,7 +43,7 @@ export default function MessageBuble({ message }: { message: Message }) {
                 <span className="break-words relative">
                     {decrypt(message.content)}
                     <div className={`cursor-pointer gap-2 flex flex-col group-hover:opacity-90 bg-transparent hover:bg-transparent opacity-0 absolute transition-all bottom-[-2rem] ${isMine ? "left-[-3rem]" : "right-[-3rem]"}`}>
-                        {isMine && <EditMessage message={message} />}
+                        {isMine && differenceDay < 1 && <EditMessage message={message} />}
                         <DropdownMenu >
                             <DropdownMenuTrigger asChild >
                                 <ChevronDown className={`h-6 w-6`} />
@@ -52,7 +59,10 @@ export default function MessageBuble({ message }: { message: Message }) {
                 </span>
                 <p className={`text-[0.7rem] mt-1 ${isMine ? "text-primary-foreground/70" : "text-muted-foreground"
                     }`}>
-                    {formatHours(message.timestamp)}
+                    {formatHours(message.timestamp)} {"   "}
+                    {new Date(message.timestamp).getTime() !== new Date(message.updatedAt).getTime() &&
+                        <span className="italic">Edited</span>
+                    }
                 </p>
             </div>
         </div>
