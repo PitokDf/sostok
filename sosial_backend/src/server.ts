@@ -20,8 +20,7 @@ const app = express();
 console.log(process.env.FRONTEND_URL);
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true
+    origin: process.env.FRONTEND_URL
 }))
 app.use(cookieParser()); // untuk parsing cookies pada request
 app.use(compression()); // kompresi response json agar lebih kecil
