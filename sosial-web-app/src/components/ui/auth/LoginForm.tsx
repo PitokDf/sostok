@@ -40,7 +40,7 @@ export default function LoginForm() {
                 window.location.href = "/"
             }
         } catch (error: any) {
-            const errorMsg = error.response.data.msg
+            const errorMsg = error?.response?.data?.msg
             setErrorMsg(errorMsg ?? "")
             console.log(error);
         } finally { setIsLoading(false) }
