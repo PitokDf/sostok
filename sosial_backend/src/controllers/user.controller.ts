@@ -34,14 +34,14 @@ const mapProfile = (user: any, accessToken: string, userLoggin: any) => {
 
 export const profileController = async (req: Request, res: Response<responseApi>) => {
     try {
-        const accessToken = req.cookies.accessToken;;
+        const accessToken = req.headers.authorization?.split("Bearer ")[1];
         let userLoggin;
         if (accessToken) userLoggin = await verifyAccessToken(accessToken)
 
         const { username } = req.params;
         const user = await userMeService(username || userLoggin?.username!);
 
-        const profile = mapProfile(user, accessToken, userLoggin)
+        const profile = mapProfile(user, accessToken!, userLoggin)
         return res.status(200).json({
             success: true,
             statusCode: 200,
@@ -102,12 +102,12 @@ export const updateUserController = async (req: Request, res: Response<responseA
 export const searchUserProfilesController = async (req: Request, res: Response<responseApi>) => {
     try {
         const { query } = req.params
-        const accessToken = req.cookies.accessToken;;
-        const userLoggin = await verifyAccessToken(accessToken);
+        const accessToken = req.headers.authorization?.split("Bearer ")[1];
+        const userLoggin = await verifyAccessToken(accessToken!);
 
         const users = await searchUserProfileService(query)
         const userMap = users.map((user) => (
-            mapProfile(user, accessToken, userLoggin)
+            mapProfile(user, accessToken!, userLoggin)
         ))
 
         return res.status(200).json({

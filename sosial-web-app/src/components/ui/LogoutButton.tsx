@@ -18,6 +18,7 @@ export default function LogoutButton() {
         try {
             await api.post("/auth/logout");
             removeFromLocaleStorage("user");
+            removeFromLocaleStorage("token");
             document.cookie = `token=; path=/; max-age=0`
             window.location.reload()
         } catch (error) {

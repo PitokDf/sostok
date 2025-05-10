@@ -32,7 +32,10 @@ export default function LoginForm() {
         try {
             const response = await api.post("/auth/login", data, { headers: { "Content-Type": "application/json" } });
             if (response.status == 200) {
+                console.log(response.data.data.accessToken);
+                const token = response.data.data.accessToken
                 storeToLocalStorage('user', response.data.data.user)
+                storeToLocalStorage('token', token)
                 document.cookie = `token=${response.data.data.accessToken}; path=/; max-age=${7 * 24 * 60 * 60 * 1000}`
                 window.location.href = "/"
             }

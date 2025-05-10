@@ -3,7 +3,8 @@ import { responseApi } from "../types/response_type";
 import { verifyAccessToken } from "../services/auth.service";
 
 export const authenticateToken = async (req: Request, res: Response<responseApi>, next: NextFunction) => {
-    const accessToken = req.cookies.accessToken;
+    const accessToken = req.headers.authorization?.split("Bearer ")[1]!
+
     try {
         const verifyToken = await verifyAccessToken(accessToken);
         (req as any).user = verifyToken;

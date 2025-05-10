@@ -35,6 +35,8 @@ export default function MessagesPage() {
         }
     })
 
+    console.log(listConversations);
+
     const { data: messages, isLoading: isMessageLoading } = useQuery<Message[]>({
         queryKey: ["messages", selectedChat?.conversationID],
         queryFn: async () => {
@@ -75,7 +77,7 @@ export default function MessagesPage() {
     })
     if (isConversationLoading) return <h1>Loading...</h1>
 
-    const filteredChats = listConversations!.filter((chat: any) =>
+    const filteredChats = listConversations?.filter((chat: any) =>
         chat.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
@@ -104,7 +106,7 @@ export default function MessagesPage() {
 
                     <ScrollArea className="flex-1 -mx-2 px-2 mt-4">
                         <div className="space-y-2">
-                            {filteredChats.map((chat) => (
+                            {filteredChats?.map((chat) => (
                                 <ChatListItem
                                     key={chat.conversationID}
                                     chat={chat as any}
