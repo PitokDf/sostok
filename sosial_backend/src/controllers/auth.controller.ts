@@ -51,7 +51,7 @@ export const loginController = async (req: Request, res: Response<responseApi>) 
             success: true,
             statusCode: 200,
             msg: "Berhasil login",
-            data: payload
+            data: { user: payload, accessToken }
         });
     } catch (error) {
         handleError(error, res);

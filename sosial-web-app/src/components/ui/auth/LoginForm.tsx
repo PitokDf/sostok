@@ -32,7 +32,8 @@ export default function LoginForm() {
         try {
             const response = await api.post("/auth/login", data, { headers: { "Content-Type": "application/json" } });
             if (response.status == 200) {
-                storeToLocalStorage('user', response.data.data)
+                storeToLocalStorage('user', response.data.data.user)
+                document.cookie = `token=${response.data.data.accessToken}; path=/; max-age=${7 * 24 * 60 * 60 * 1000}`
                 window.location.href = "/"
             }
         } catch (error: any) {
